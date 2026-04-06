@@ -3,13 +3,13 @@ import { motion } from "framer-motion";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { loginService } from "@/service/login";
+import { useLogin } from "@/service/tclService";
 
 const Login = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const loginMutation = loginService();
+    const loginMutation = useLogin();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -104,13 +104,9 @@ const Login = () => {
                         initial="hidden"
                         animate="visible"
                     >
-                        <motion.img
-                            src="/logo.png"
-                            alt="Growatt Logo"
-                            className="h-20 w-auto object-contain"
-                            whileHover={{ scale: 1.05 }}
-                            transition={{ type: "spring", stiffness: 300 }}
-                        />
+                        <div className="text-4xl font-black italic text-primary tracking-tighter">
+                            TCL<span className="text-muted-foreground not-italic font-light">Server</span>
+                        </div>
                     </motion.div>
 
                     {/* Form */}

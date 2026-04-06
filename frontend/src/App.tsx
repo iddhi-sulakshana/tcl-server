@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import Analytics from "./pages/Analytics";
 import { useAuthStore } from "./lib/AuthStore";
 
 const App = () => {
@@ -16,10 +15,10 @@ const App = () => {
     return (
         <Routes>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/analytics" element={<Analytics />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
     );
 };
 
 export default App;
+
