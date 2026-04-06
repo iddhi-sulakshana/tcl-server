@@ -62,57 +62,36 @@ const Login = () => {
         }),
     };
 
-    const inputVariants = {
-        focus: {
-            y: -2,
-            boxShadow: "0 4px 12px rgba(34, 197, 94, 0.2)",
-            transition: { duration: 0.3 },
-        },
-    };
-
     return (
-        <div className="min-h-screen w-full bg-gray-100 dark:bg-background flex items-center justify-center p-4">
+        <div className="min-h-screen w-full flex items-center justify-center p-4 selection:bg-primary/30">
             <div className="w-full max-w-md">
                 <motion.div
                     variants={containerVariants}
                     initial="hidden"
                     animate="visible"
-                    className="bg-white dark:bg-card rounded-lg shadow-lg dark:shadow-none dark:border dark:border-border p-8 space-y-6 relative overflow-hidden"
+                    className="glass-card rounded-[2.5rem] p-10 space-y-8 relative overflow-hidden"
                 >
-                    {/* Background shimmer effect */}
-                    <motion.div
-                        className="absolute inset-0 opacity-30"
-                        style={{
-                            background:
-                                "linear-gradient(45deg, transparent 30%, rgba(34, 197, 94, 0.1) 50%, transparent 70%)",
-                        }}
-                        animate={{
-                            x: ["-100%", "100%"],
-                            y: ["-100%", "100%"],
-                        }}
-                        transition={{
-                            duration: 3,
-                            repeat: Infinity,
-                            ease: "linear",
-                        }}
-                    />
+                    {/* Background glow effect */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[80px] -mr-16 -mt-16" />
+                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/5 blur-[80px] -ml-16 -mb-16" />
 
                     {/* Logo */}
                     <motion.div
-                        className="flex justify-center mb-8 relative z-10"
+                        className="text-center relative z-10"
                         variants={logoVariants}
                         initial="hidden"
                         animate="visible"
                     >
-                        <div className="text-4xl font-black italic text-primary tracking-tighter">
-                            TCL<span className="text-muted-foreground not-italic font-light">Server</span>
+                        <div className="text-4xl font-heading font-black italic text-primary tracking-tighter uppercase">
+                            TCL<span className="text-on-surface-variant not-italic font-light lowercase text-2xl tracking-normal">_server</span>
                         </div>
+                        <p className="text-[10px] uppercase font-bold tracking-[0.4em] text-on-surface-variant mt-2 opacity-60">Neon Observatory v1.0</p>
                     </motion.div>
 
                     {/* Form */}
                     <motion.form
                         onSubmit={handleSubmit}
-                        className="space-y-4 relative z-10"
+                        className="space-y-6 relative z-10"
                     >
                         {/* Username Field */}
                         <motion.div
@@ -122,25 +101,18 @@ const Login = () => {
                             animate="visible"
                             custom={0}
                         >
-                            <Label htmlFor="username" className="text-gray-500 dark:text-muted-foreground">
+                            <Label htmlFor="username" className="text-[10px] uppercase font-bold tracking-widest text-on-surface-variant ml-1">
                                 Username
                             </Label>
-                            <motion.div
-                                variants={inputVariants}
-                                whileFocus="focus"
-                            >
-                                <Input
-                                    id="username"
-                                    type="text"
-                                    value={username}
-                                    onChange={(e) =>
-                                        setUsername(e.target.value)
-                                    }
-                                    className="focus-visible:ring-green-500 dark:focus-visible:ring-green-400 hover:border-green-400 dark:hover:border-border py-5 bg-background dark:bg-background text-foreground"
-                                    placeholder="Enter your username"
-                                    required
-                                />
-                            </motion.div>
+                            <Input
+                                id="username"
+                                type="text"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                className="h-14 bg-surface-container-lowest/50 border-white/5 focus-visible:ring-primary/50 text-on-surface rounded-xl px-5"
+                                placeholder="TCL ID / Email"
+                                required
+                            />
                         </motion.div>
 
                         {/* Password Field */}
@@ -151,57 +123,35 @@ const Login = () => {
                             animate="visible"
                             custom={1}
                         >
-                            <Label htmlFor="password" className="text-gray-500 dark:text-muted-foreground">
+                            <Label htmlFor="password" className="text-[10px] uppercase font-bold tracking-widest text-on-surface-variant ml-1">
                                 Password
                             </Label>
-                            <motion.div
-                                variants={inputVariants}
-                                whileFocus="focus"
-                            >
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    value={password}
-                                    onChange={(e) =>
-                                        setPassword(e.target.value)
-                                    }
-                                    className="focus-visible:ring-green-500 dark:focus-visible:ring-green-400 hover:border-green-400 dark:hover:border-border py-5 bg-background dark:bg-background text-foreground"
-                                    placeholder="Enter your password"
-                                    required
-                                />
-                            </motion.div>
+                            <Input
+                                id="password"
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="h-14 bg-surface-container-lowest/50 border-white/5 focus-visible:ring-primary/50 text-on-surface rounded-xl px-5"
+                                placeholder="••••••••"
+                                required
+                            />
                         </motion.div>
 
                         {/* Login Button */}
                         <motion.div
-                            className="pt-2"
+                            className="pt-4"
                             variants={formItemVariants}
                             initial="hidden"
                             animate="visible"
                             custom={2}
                         >
-                            <motion.div
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                className="relative"
-                            >
-                                <motion.div
-                                    className="absolute inset-0 bg-green-400 rounded-md opacity-0"
-                                    whileHover={{
-                                        opacity: [0, 0.3, 0],
-                                        scale: [1, 1.5, 1.5],
-                                    }}
-                                    transition={{
-                                        duration: 1.5,
-                                        repeat: Infinity,
-                                    }}
-                                />
+                            <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
                                 <Button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="relative w-full bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500 text-white shadow-md hover:shadow-lg dark:shadow-none transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full h-14 bg-primary text-on-primary hover:bg-primary-dim font-bold rounded-xl shadow-lg shadow-primary/20 transition-all uppercase tracking-widest text-xs disabled:opacity-50"
                                 >
-                                    {isLoading ? "Logging in..." : "Login"}
+                                    {isLoading ? "Synchronizing..." : "Initialize Session"}
                                 </Button>
                             </motion.div>
                         </motion.div>
@@ -213,3 +163,4 @@ const Login = () => {
 };
 
 export default Login;
+

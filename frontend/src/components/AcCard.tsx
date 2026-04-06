@@ -1,7 +1,7 @@
 import React from "react";
 import { useDeviceState, useUpdateDeviceState } from "@/service/tclService";
 import type { DeviceItem } from "@/types/tcl";
-import { Power, Wind, CheckCircle2, Circle } from "lucide-react";
+import { Wind, Snowflake, Droplets, Sun, ChevronUp, ChevronDown, Check } from "lucide-react";
 import { useSelectionStore } from "@/lib/SelectionStore";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -19,11 +19,28 @@ const AcCard = ({ device, onClick }: AcCardProps) => {
     const isSelected = selectedDeviceIds.includes(device.deviceId);
     const isOn = state?.powerSwitch === 1;
 
-    const handlePowerToggle = (e: React.MouseEvent) => {
+    const handleTempChange = (e: React.MouseEvent, delta: number) => {
+        e.stopPropagation();
+        if (!state) return;
+        updateState.mutate({
+            deviceId: device.deviceId,
+            properties: { targetTemperature: state.targetTemperature + delta },
+        });
+    };
+
+    const handleModeChange = (e: React.MouseEvent, mode: number) => {
         e.stopPropagation();
         updateState.mutate({
             deviceId: device.deviceId,
-            properties: { powerSwitch: isOn ? 0 : 1 },
+            properties: { workMode: mode },
+        });
+    };
+
+    const handleFanChange = (e: React.MouseEvent, speed: number) => {
+        e.stopPropagation();
+        updateState.mutate({
+            deviceId: device.deviceId,
+            properties: { windSpeed7Gear: speed },
         });
     };
 
@@ -34,93 +51,138 @@ const AcCard = ({ device, onClick }: AcCardProps) => {
 
     if (isLoading) {
         return (
-            <div className="h-40 glass animate-pulse rounded-2xl flex items-center justify-center">
-                <div className="w-10 h-10 rounded-full bg-gray-200/50" />
-            </div>
+            <div className="w-full h-80 glass-card animate-pulse rounded-[2rem]" />
         );
     }
 
     return (
         <motion.div
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={onClick}
+            whileHover={{ y: -8 }}
             className={cn(
-                "relative p-5 glass rounded-3xl cursor-pointer transition-all duration-500",
-                isOn ? "ring-2 ring-primary/50 shadow-primary/20" : "opacity-80 grayscale-[0.2]"
+                "glass-card w-full rounded-[2rem] p-8 relative overflow-hidden group transition-all duration-500",
+                isOn ? "neon-border-primary neon-glow-primary" : "opacity-60 grayscale-[0.5] border-white/5",
+                isSelected && "ring-2 ring-primary"
             )}
+            onClick={onClick}
         >
-            <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-3">
-                    <div className={cn(
-                        "p-3 rounded-2xl transition-colors duration-500",
-                        isOn ? "bg-primary text-white" : "bg-gray-200/50 text-gray-400"
-                    )}>
-                        <Wind size={24} />
-                    </div>
-                    <div>
-                        <h3 className="font-semibold text-lg line-clamp-1">{device.nickName}</h3>
-                        <p className="text-xs text-muted-foreground opacity-70">
-                            Indoor {state?.currentTemperature}°C
-                        </p>
+            {/* Selection Checkmark */}
+            <div 
+                onClick={handleSelect}
+                className={cn(
+                    "absolute top-6 right-6 w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer z-10",
+                    isSelected ? "bg-primary text-on-primary scale-110 shadow-lg shadow-primary/30" : "bg-white/5 text-white/20 hover:bg-white/10"
+                )}
+            >
+                <Check size={16} strokeWidth={3} />
+            </div>
+
+            {/* Header Info */}
+            <div className="flex justify-between items-start mb-8">
+                <div>
+                    <h3 className="text-xl font-heading font-bold text-on-surface line-clamp-1 pr-10">
+                        {device.nickName}
+                    </h3>
+                    <div className="flex items-center gap-2 mt-1">
+                        <span className={cn(
+                            "w-2 h-2 rounded-full",
+                            isOn ? "bg-tertiary animate-pulse" : "bg-white/20"
+                        )} />
+                        <span className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">
+                            {isOn ? (
+                                state?.workMode === 1 ? "Cooling Active" :
+                                state?.workMode === 4 ? "Heating Active" :
+                                "System Active"
+                            ) : "System Offline"}
+                        </span>
                     </div>
                 </div>
-                
-                <div className="flex gap-2">
-                    <button
-                        onClick={handleSelect}
-                        className={cn(
-                            "p-2 rounded-full transition-all",
-                            isSelected ? "text-primary bg-primary/10" : "text-gray-300 hover:text-primary/50"
-                        )}
-                    >
-                        {isSelected ? <CheckCircle2 size={24} /> : <Circle size={24} />}
-                    </button>
-                    <button
-                        onClick={handlePowerToggle}
-                        className={cn(
-                            "p-3 rounded-full transition-all duration-500",
-                            isOn ? "bg-red-500 text-white shadow-lg shadow-red-200" : "bg-gray-200 text-gray-400 hover:bg-gray-300"
-                        )}
-                    >
-                        <Power size={20} />
-                    </button>
+                <div className="p-2 bg-primary/10 rounded-xl text-primary">
+                    <Snowflake size={24} />
                 </div>
             </div>
 
-            <div className="flex items-end justify-between">
-                <div>
-                    <span className="text-4xl font-bold tracking-tighter">
-                        {state?.targetTemperature}°C
+            {/* Temperature Readout */}
+            <div className="flex items-center justify-center gap-10 mb-10">
+                <button 
+                    onClick={(e) => handleTempChange(e, -1)}
+                    className="w-12 h-12 rounded-full border border-primary/20 flex items-center justify-center hover:bg-primary/20 transition-all active:scale-90 text-on-surface/60 hover:text-primary"
+                >
+                    <ChevronDown size={24} />
+                </button>
+                
+                <div className="text-center relative">
+                    <div className="text-[5rem] leading-none font-heading font-bold text-transparent bg-clip-text bg-gradient-to-b from-primary to-primary-dim">
+                        {state?.targetTemperature ?? "--"}°
+                    </div>
+                    <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.3em] absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                        Target Temp
                     </span>
                 </div>
-                <div className="flex flex-col items-end gap-1">
-                    <div className={cn(
-                        "flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full",
-                        state?.workMode === 1 ? "bg-blue-500/10 text-blue-500" : 
-                        state?.workMode === 0 ? "bg-green-500/10 text-green-500" :
-                        state?.workMode === 4 ? "bg-orange-500/10 text-orange-500" :
-                        "bg-gray-500/10 text-gray-500"
-                    )}>
-                        {state?.workMode === 0 && "Auto"}
-                        {state?.workMode === 1 && "Cool"}
-                        {state?.workMode === 2 && "Dry"}
-                        {state?.workMode === 3 && "Fan"}
-                        {state?.workMode === 4 && "Heat"}
-                    </div>
-                </div>
+
+                <button 
+                    onClick={(e) => handleTempChange(e, 1)}
+                    className="w-12 h-12 rounded-full border border-primary/20 flex items-center justify-center hover:bg-primary/20 transition-all active:scale-90 text-on-surface/60 hover:text-primary"
+                >
+                    <ChevronUp size={24} />
+                </button>
             </div>
 
-            {/* Slider Track Visualization */}
-            <div className="mt-4 h-2 bg-gray-100 rounded-full overflow-hidden">
-                <motion.div 
-                    initial={{ width: 0 }}
-                    animate={{ width: `${((state?.targetTemperature ?? 16) - 16) / (32 - 16) * 100}%` }}
-                    className="h-full bg-gradient-to-r from-blue-400 to-blue-600"
-                />
+            {/* Quick Controls Grid */}
+            <div className="grid grid-cols-1 gap-6">
+                {/* Mode Strip */}
+                <div>
+                    <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-3 block opacity-60">Operation Mode</span>
+                    <div className="flex justify-between bg-surface-container-lowest/50 p-1 rounded-2xl border border-white/5">
+                        {[
+                            { id: 1, icon: Snowflake, name: "Cool" },
+                            { id: 0, icon: Sun, name: "Auto" },
+                            { id: 2, icon: Droplets, name: "Dry" },
+                            { id: 3, icon: Wind, name: "Fan" },
+                            { id: 4, icon: Sun, name: "Heat" } // Using Sun for Heat too
+                        ].map((m) => (
+                            <button
+                                key={m.id}
+                                onClick={(e) => handleModeChange(e, m.id)}
+                                className={cn(
+                                    "flex-1 py-3 rounded-xl transition-all flex items-center justify-center",
+                                    state?.workMode === m.id ? "bg-primary text-on-primary shadow-lg shadow-primary/20" : "text-on-surface-variant hover:text-on-surface"
+                                )}
+                            >
+                                <m.icon size={18} />
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Fan Speed Row */}
+                <div>
+                    <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-3 block opacity-60">Fan Speed</span>
+                    <div className="flex gap-2">
+                        {[
+                            { id: 2, name: "Low" },
+                            { id: 4, name: "Mid" },
+                            { id: 6, name: "High" },
+                            { id: 7, name: "Turbo" }
+                        ].map((s) => (
+                            <button
+                                key={s.id}
+                                onClick={(e) => handleFanChange(e, s.id)}
+                                className={cn(
+                                    "flex-1 py-2 text-[10px] font-bold uppercase border rounded-lg transition-all",
+                                    state?.windSpeed7Gear === s.id 
+                                        ? "bg-primary/20 border-primary/50 text-white shadow-[0_0_15px_rgba(94,180,255,0.1)]" 
+                                        : "border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-highest"
+                                )}
+                            >
+                                {s.name}
+                            </button>
+                        ))}
+                    </div>
+                </div>
             </div>
         </motion.div>
     );
 };
 
 export default AcCard;
+

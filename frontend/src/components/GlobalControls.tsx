@@ -1,11 +1,10 @@
 import { useBulkUpdate } from "@/service/tclService";
 import { useSelectionStore } from "@/lib/SelectionStore";
-import { Power, Trash2, CheckCircle2, RefreshCcw, Snowflake, Zap, Wind } from "lucide-react";
+import { Power, RefreshCcw, Snowflake, Wind, CheckCircle2, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
 
-const GlobalControls = ({ availableDeviceIds }: { availableDeviceIds: string[] }) => {
-    const { selectedDeviceIds, clearSelection, selectAll } = useSelectionStore();
+const GlobalControls = () => {
+    const { selectedDeviceIds, clearSelection } = useSelectionStore();
     const bulkUpdate = useBulkUpdate();
 
     const hasSelection = selectedDeviceIds.length > 0;
@@ -25,118 +24,128 @@ const GlobalControls = ({ availableDeviceIds }: { availableDeviceIds: string[] }
     };
 
     const handleBulkMode = (mode: number) => {
-        const properties: any = { workMode: mode };
-        if (mode === 1) properties.targetTemperature = 16;
-        if (mode === 3) properties.targetTemperature = 31;
-
         bulkUpdate.mutate({
             deviceIds: selectedDeviceIds,
-            properties,
+            properties: { workMode: mode },
+        });
+    };
+
+    const handleBulkFan = (speed: number) => {
+        bulkUpdate.mutate({
+            deviceIds: selectedDeviceIds,
+            properties: { windSpeed7Gear: speed },
         });
     };
 
     return (
         <AnimatePresence>
             {hasSelection && (
-                <motion.div
-                    initial={{ y: 100, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: 100, opacity: 0 }}
-                    className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-4xl"
+                <motion.footer
+                    initial={{ y: 100, x: "-50%", opacity: 0 }}
+                    animate={{ y: 0, x: "-50%", opacity: 1 }}
+                    exit={{ y: 100, x: "-50%", opacity: 0 }}
+                    className="fixed bottom-8 left-1/2 w-full max-w-5xl z-50 px-6"
                 >
-                    <div className="glass p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl border-white/20">
-                        <div className="flex items-center gap-4">
-                            <div className="bg-primary/10 px-4 py-2 rounded-2xl flex items-center gap-2">
-                                <CheckCircle2 className="text-primary" size={20} />
-                                <span className="font-bold text-primary">{selectedDeviceIds.length} Selected</span>
-                            </div>
-                            <button
-                                onClick={clearSelection}
-                                className="p-2 text-muted-foreground hover:text-red-500 transition-colors"
-                                title="Clear Selection"
-                            >
-                                <Trash2 size={24} />
-                            </button>
-                            <button
-                                onClick={() => selectAll(availableDeviceIds)}
-                                className="text-sm font-semibold text-primary/70 hover:text-primary"
-                            >
-                                Select All
-                            </button>
+                    <div className="master-bar-glass rounded-full px-12 py-6 flex flex-wrap justify-center items-center gap-12 shadow-[0px_20px_60px_rgba(0,0,0,0.4),0px_0px_20px_rgba(94,180,255,0.1)]">
+                        
+                        {/* Selection Badge & Clear */}
+                        <div className="flex flex-col items-center gap-2">
+                             <span className="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase opacity-60">Selection</span>
+                             <div className="flex items-center gap-3">
+                                <div className="bg-primary/20 text-primary px-3 py-1.5 rounded-lg flex items-center gap-2 font-bold text-xs ring-1 ring-primary/30">
+                                    <CheckCircle2 size={14} />
+                                    {selectedDeviceIds.length}
+                                </div>
+                                <button onClick={clearSelection} className="text-on-surface-variant hover:text-secondary transition-colors">
+                                    <Trash2 size={20} />
+                                </button>
+                             </div>
                         </div>
 
-                        <div className="flex flex-wrap items-center justify-center gap-3">
-                            {/* Power Controls */}
-                            <div className="flex gap-2 bg-gray-100/50 p-1.5 rounded-2xl">
-                                <button
-                                    onClick={() => handleBulkPower(true)}
-                                    className="px-4 py-2 bg-green-500 text-white rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-green-200"
-                                >
-                                    <Power size={18} /> On
-                                </button>
-                                <button
+                        {/* Power Controls */}
+                        <div className="space-y-2">
+                            <span className="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase block text-center opacity-60">Power</span>
+                            <div className="flex gap-4">
+                                <button 
                                     onClick={() => handleBulkPower(false)}
-                                    className="px-4 py-2 bg-red-500 text-white rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-red-200"
+                                    className="w-12 h-12 rounded-full bg-secondary/20 text-secondary border border-secondary/30 shadow-[0_0_15px_rgba(255,113,98,0.2)] active:scale-95 transition-all flex items-center justify-center"
                                 >
-                                    <Power size={18} /> Off
+                                    <Power size={22} strokeWidth={2.5} />
+                                </button>
+                                <button 
+                                    onClick={() => handleBulkPower(true)}
+                                    className="w-12 h-12 rounded-full bg-tertiary/20 text-tertiary border border-tertiary/30 shadow-[0_0_15px_rgba(0,253,193,0.2)] active:scale-95 transition-all flex items-center justify-center"
+                                >
+                                    <Power size={22} strokeWidth={2.5} />
                                 </button>
                             </div>
+                        </div>
 
-                            {/* Mode Controls */}
-                            <div className="flex gap-2 bg-gray-100/50 p-1.5 rounded-2xl">
-                                <button
-                                    onClick={() => handleBulkMode(0)}
-                                    className={cn("p-2 rounded-xl shadow-sm hover:shadow-md transition-all bg-white text-gray-500")}
-                                    title="Auto All"
-                                >
-                                    <RefreshCcw size={20} />
-                                </button>
-                                <button
-                                    onClick={() => handleBulkMode(1)}
-                                    className={cn("p-2 rounded-xl shadow-sm hover:shadow-md transition-all bg-white text-blue-500")}
-                                    title="Cool All"
-                                >
-                                    <Snowflake size={20} />
-                                </button>
-                                <button
-                                    onClick={() => handleBulkMode(3)}
-                                    className={cn("p-2 rounded-xl shadow-sm hover:shadow-md transition-all bg-white text-teal-500")}
-                                    title="Fan All"
-                                >
-                                    <Wind size={20} />
-                                </button>
-                                <button
-                                    onClick={() => handleBulkMode(4)}
-                                    className={cn("p-2 rounded-xl shadow-sm hover:shadow-md transition-all bg-white text-orange-500")}
-                                    title="Heat All"
-                                >
-                                    <Zap size={20} />
-                                </button>
-                            </div>
-
-                            {/* Generator Modes */}
-                            <div className="flex gap-2 bg-gray-100/50 p-1.5 rounded-2xl overflow-hidden">
-                                {[1, 2, 3, 0].map((mode) => (
-                                    <button
-                                        key={mode}
-                                        onClick={() => handleBulkGenMode(mode)}
-                                        className={cn(
-                                            "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex flex-col items-center",
-                                            mode === 0 
-                                                ? "bg-gray-400 text-white" 
-                                                : "bg-amber-100 text-amber-700 hover:bg-amber-200"
-                                        )}
+                        {/* Generator Mode */}
+                        <div className="space-y-2">
+                            <span className="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase block text-center opacity-60">Generator</span>
+                            <div className="flex bg-surface-container-highest/40 backdrop-blur-md rounded-xl p-1 gap-1 border border-white/5">
+                                {[
+                                    { id: 0, label: "Off" },
+                                    { id: 1, label: "Lvl 1" },
+                                    { id: 2, label: "Lvl 2" }
+                                ].map((g) => (
+                                    <button 
+                                        key={g.id}
+                                        onClick={() => handleBulkGenMode(g.id)}
+                                        className="px-4 py-2 text-[10px] font-bold uppercase rounded-lg hover:bg-white/5 text-on-surface-variant transition-all active:bg-primary active:text-on-primary"
                                     >
-                                        <span>Gen {mode === 0 ? "Off" : mode}</span>
+                                        {g.label}
                                     </button>
                                 ))}
                             </div>
                         </div>
+
+                        {/* Master Mode */}
+                        <div className="space-y-2">
+                            <span className="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase block text-center opacity-60">Master Mode</span>
+                            <div className="flex bg-surface-container-highest/40 backdrop-blur-md rounded-xl p-1 gap-1 border border-white/5">
+                                {[
+                                    { id: 0, icon: RefreshCcw },
+                                    { id: 1, icon: Snowflake },
+                                    { id: 3, icon: Wind }
+                                ].map((m) => (
+                                    <button 
+                                        key={m.id}
+                                        onClick={() => handleBulkMode(m.id)}
+                                        className="p-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all active:bg-primary active:text-on-primary"
+                                    >
+                                        <m.icon size={20} />
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Fan Selector */}
+                        <div className="space-y-2">
+                            <span className="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase block text-center opacity-60">Fan Speed</span>
+                            <div className="flex bg-surface-container-highest/40 backdrop-blur-md rounded-xl p-1 gap-1 border border-white/5">
+                                {[
+                                    { id: 4, name: "Mid" },
+                                    { id: 7, name: "Turbo" }
+                                ].map((s) => (
+                                    <button 
+                                        key={s.id}
+                                        onClick={() => handleBulkFan(s.id)}
+                                        className="px-3 py-1.5 text-[10px] font-bold uppercase rounded-lg text-on-surface-variant hover:bg-white/5 transition-all active:bg-primary/20 active:text-primary active:border-primary/20"
+                                    >
+                                        {s.name}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
                     </div>
-                </motion.div>
+                </motion.footer>
             )}
         </AnimatePresence>
     );
 };
 
 export default GlobalControls;
+
