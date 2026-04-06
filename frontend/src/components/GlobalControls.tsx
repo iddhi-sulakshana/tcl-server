@@ -1,24 +1,27 @@
-import { useBulkUpdate } from "@/service/tclService";
+import { useBulkUpdate, useDevices } from "@/service/tclService";
 import { useSelectionStore } from "@/lib/SelectionStore";
-import { Power, RefreshCcw, Snowflake, Wind } from "lucide-react";
+import { Power, PowerOff, RefreshCcw, Snowflake, Wind } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const GlobalControls = () => {
     const { selectedDeviceIds } = useSelectionStore();
+    const { data: devices } = useDevices();
     const bulkUpdate = useBulkUpdate();
 
-    const hasSelection = selectedDeviceIds.length > 0;
+    const allDeviceIds = devices?.map((d) => d.deviceId) || [];
+    const targetDeviceIds = selectedDeviceIds.length > 0 ? selectedDeviceIds : allDeviceIds;
+    const isUsingAll = selectedDeviceIds.length === 0;
 
     const handleBulkPower = (isOn: boolean) => {
         bulkUpdate.mutate({
-            deviceIds: selectedDeviceIds,
+            deviceIds: targetDeviceIds,
             properties: { powerSwitch: isOn ? 1 : 0 },
         });
     };
 
     const handleBulkGenMode = (mode: number) => {
         bulkUpdate.mutate({
-            deviceIds: selectedDeviceIds,
+            deviceIds: targetDeviceIds,
             properties: { generatorMode: mode },
         });
     };
@@ -29,115 +32,125 @@ const GlobalControls = () => {
         if (mode === 3) properties.targetTemperature = 31;
 
         bulkUpdate.mutate({
-            deviceIds: selectedDeviceIds,
+            deviceIds: targetDeviceIds,
             properties,
         });
     };
 
     const handleBulkFan = (speed: number) => {
         bulkUpdate.mutate({
-            deviceIds: selectedDeviceIds,
+            deviceIds: targetDeviceIds,
             properties: { windSpeed7Gear: speed },
         });
     };
 
     return (
         <AnimatePresence>
-            {hasSelection && (
-                <motion.footer
-                    initial={{ y: 100, x: "-50%", opacity: 0 }}
-                    animate={{ y: 0, x: "-50%", opacity: 1 }}
-                    exit={{ y: 100, x: "-50%", opacity: 0 }}
-                    className="fixed bottom-8 left-1/2 w-full max-w-5xl z-50 px-6"
-                >
-                    <div className="master-bar-glass rounded-full px-12 py-6 flex flex-wrap justify-center items-center gap-12 shadow-[0px_20px_60px_rgba(0,0,0,0.4),0px_0px_20px_rgba(94,180,255,0.1)]">
-                        
+            <motion.footer
+                initial={{ y: 100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 100, opacity: 0 }}
+                className="fixed bottom-8 inset-x-0 mx-auto w-[92%] max-w-4xl z-50 pointer-events-none"
+            >
+                <div className="pointer-events-auto relative">
+                    {/* Seamless Master Controller Bar */}
+                    <div className="bg-[#0A101A]/90 backdrop-blur-3xl border border-white/10 shadow-[0_20px_100px_rgba(0,0,0,0.8)] 
+                        rounded-[2rem] sm:rounded-[2.5rem] p-4 sm:p-5 sm:px-10  
+                        grid grid-cols-2 sm:flex sm:flex-row justify-between items-center gap-4 sm:gap-4 
+                        transition-all duration-500 hover:border-white/20"
+                    >
+                        {/* Status Float Label */}
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-[#0A101A] border border-white/10 shadow-2xl">
+                             <div className={`w-1 h-1 rounded-full animate-pulse ${isUsingAll ? "bg-primary" : "bg-tertiary"}`} />
+                             <span className="text-[7px] sm:text-[8px] font-black tracking-[0.3em] uppercase text-on-surface-variant opacity-80 whitespace-nowrap">
+                                {isUsingAll ? "Global Mode: ALL" : `Selection: ${selectedDeviceIds.length}`}
+                             </span>
+                        </div>
 
-                        {/* Power Controls */}
-                        <div className="space-y-2">
-                            <span className="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase block text-center opacity-60">Power</span>
-                            <div className="flex gap-4">
+                        {/* Power Section */}
+                        <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+                            <span className="text-[8px] sm:text-[9px] font-black tracking-[0.2em] uppercase text-on-surface-variant opacity-30">Power</span>
+                            <div className="flex gap-3 sm:gap-4">
                                 <button 
                                     onClick={() => handleBulkPower(false)}
-                                    className="w-12 h-12 rounded-full bg-secondary/20 text-secondary border border-secondary/30 shadow-[0_0_15px_rgba(255,113,98,0.2)] active:scale-95 transition-all flex items-center justify-center"
+                                    className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-secondary/10 text-secondary border border-secondary/20 hover:bg-secondary/20 active:scale-90 transition-all flex items-center justify-center p-0"
                                 >
-                                    <Power size={22} strokeWidth={2.5} />
+                                    <PowerOff size={18} className="sm:size-[20px] drop-shadow-[0_0_8px_rgba(255,113,98,0.3)]" />
                                 </button>
                                 <button 
                                     onClick={() => handleBulkPower(true)}
-                                    className="w-12 h-12 rounded-full bg-tertiary/20 text-tertiary border border-tertiary/30 shadow-[0_0_15px_rgba(0,253,193,0.2)] active:scale-95 transition-all flex items-center justify-center"
+                                    className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-tertiary/10 text-tertiary border border-tertiary/20 hover:bg-tertiary/20 active:scale-90 transition-all flex items-center justify-center p-0"
                                 >
-                                    <Power size={22} strokeWidth={2.5} />
+                                    <Power size={18} className="sm:size-[20px] drop-shadow-[0_0_8px_rgba(0,253,193,0.3)]" />
                                 </button>
                             </div>
                         </div>
 
-                        {/* Generator Mode */}
-                        <div className="space-y-2">
-                            <span className="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase block text-center opacity-60">Generator</span>
-                            <div className="flex bg-surface-container-highest/40 backdrop-blur-md rounded-xl p-1 gap-1 border border-white/5">
-                                {[
-                                    { id: 0, label: "Off" },
-                                    { id: 1, label: "Lvl 1" },
-                                    { id: 2, label: "Lvl 2" },
-                                    { id: 3, label: "Lvl 3" }
-                                ].map((g) => (
-                                    <button 
-                                        key={g.id}
-                                        onClick={() => handleBulkGenMode(g.id)}
-                                        className="px-4 py-2 text-[10px] font-bold uppercase rounded-lg hover:bg-white/5 text-on-surface-variant transition-all active:bg-primary active:text-on-primary"
-                                    >
-                                        {g.label}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+                        <div className="hidden sm:block w-px h-10 bg-white/5 opacity-40 self-end mb-2" />
 
-                        {/* Master Mode */}
-                        <div className="space-y-2">
-                            <span className="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase block text-center opacity-60">Master Mode</span>
-                            <div className="flex bg-surface-container-highest/40 backdrop-blur-md rounded-xl p-1 gap-1 border border-white/5">
+                        {/* Master Mode Section */}
+                        <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+                            <span className="text-[8px] sm:text-[9px] font-black tracking-[0.2em] uppercase text-on-surface-variant opacity-30">Mode</span>
+                            <div className="flex bg-white/5 rounded-xl sm:rounded-2xl p-1 gap-1 border border-white/5">
                                 {[
-                                    { id: 0, icon: RefreshCcw },
-                                    { id: 1, icon: Snowflake },
-                                    { id: 3, icon: Wind }
+                                    { id: 0, icon: RefreshCcw, title: "Auto" },
+                                    { id: 1, icon: Snowflake, title: "Cool" },
+                                    { id: 3, icon: Wind, title: "Fan" }
                                 ].map((m) => (
                                     <button 
                                         key={m.id}
                                         onClick={() => handleBulkMode(m.id)}
-                                        className="p-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all active:bg-primary active:text-on-primary"
+                                        className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg sm:rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/10 transition-all active:bg-primary active:text-on-primary"
                                     >
-                                        <m.icon size={20} />
+                                        <m.icon size={16} className="sm:size-[18px]" />
                                     </button>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Fan Selector */}
-                        <div className="space-y-2">
-                            <span className="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase block text-center opacity-60">Fan Speed</span>
-                            <div className="flex bg-surface-container-highest/40 backdrop-blur-md rounded-xl p-1 gap-1 border border-white/5">
+                        <div className="hidden sm:block w-px h-10 bg-white/5 opacity-40 self-end mb-2" />
+
+                        {/* Generator Section */}
+                        <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+                            <span className="text-[8px] sm:text-[9px] font-black tracking-[0.2em] uppercase text-on-surface-variant opacity-30">Generator</span>
+                            <div className="flex bg-white/5 rounded-xl sm:rounded-2xl p-1 gap-0.5 sm:gap-1 border border-white/5">
+                                {[0, 1, 2, 3].map((g) => (
+                                    <button 
+                                        key={g}
+                                        onClick={() => handleBulkGenMode(g)}
+                                        className="w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center text-[9px] sm:text-[10px] font-black rounded-lg sm:rounded-xl hover:bg-white/10 text-on-surface-variant transition-all active:bg-primary active:text-on-primary"
+                                    >
+                                        {g === 0 ? "OFF" : g}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="hidden sm:block w-px h-10 bg-white/5 opacity-40 self-end mb-2" />
+
+                        {/* Fan Speed Section */}
+                        <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+                            <span className="text-[8px] sm:text-[9px] font-black tracking-[0.2em] uppercase text-on-surface-variant opacity-30">Fan</span>
+                            <div className="flex bg-white/5 rounded-xl sm:rounded-2xl p-1 gap-1 border border-white/5">
                                 {[
-                                    { id: 4, name: "Mid" },
-                                    { id: 7, name: "Turbo" }
+                                    { id: 4, name: "MID" },
+                                    { id: 7, name: "MAX" }
                                 ].map((s) => (
                                     <button 
                                         key={s.id}
                                         onClick={() => handleBulkFan(s.id)}
-                                        className="px-3 py-1.5 text-[10px] font-bold uppercase rounded-lg text-on-surface-variant hover:bg-white/5 transition-all active:bg-primary/20 active:text-primary active:border-primary/20"
+                                        className="px-4 sm:px-5 py-1.5 sm:py-2 text-[9px] sm:text-[10px] font-black tracking-tighter uppercase rounded-lg sm:rounded-xl text-on-surface-variant hover:bg-white/10 transition-all active:bg-primary/20 active:text-primary"
                                     >
                                         {s.name}
                                     </button>
                                 ))}
                             </div>
                         </div>
-
                     </div>
-                </motion.footer>
-            )}
+                </div>
+            </motion.footer>
         </AnimatePresence>
     );
 };
 
 export default GlobalControls;
-

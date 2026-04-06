@@ -18,6 +18,7 @@ export default function initializeServer() {
                 "Content-Type",
                 "Authorization",
                 "ngrok-skip-browser-warning",
+                "if-none-match",
             ],
             credentials: true,
         })
