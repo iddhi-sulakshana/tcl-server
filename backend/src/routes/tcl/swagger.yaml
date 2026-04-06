@@ -1,0 +1,158 @@
+openapi: 3.0.0
+info:
+  title: TCL API
+  version: 1.0.0
+  description: API for managing TCL devices and their states
+
+paths:
+  /tcl/devices:
+    get:
+      summary: Get all devices
+      tags:
+        - TCL
+      responses:
+        '200':
+          description: Device list retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Device list retrieved successfully
+                  status:
+                    type: number
+                    example: 200
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DeviceItem'
+
+  /tcl/device-state/{deviceId}:
+    get:
+      summary: Get device state
+      tags:
+        - TCL
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: forceRefresh
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Device state retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  status:
+                    type: number
+                  data:
+                    $ref: '#/components/schemas/DeviceState'
+
+    post:
+      summary: Set device state
+      tags:
+        - TCL
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                properties:
+                  type: object
+                  description: Map of properties to set (e.g. powerSwitch, targetTemperature)
+      responses:
+        '200':
+          description: Device state set successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  status:
+                    type: number
+                  data:
+                    type: object
+                    properties:
+                      success:
+                        type: boolean
+                      message:
+                        type: string
+
+  /tcl/relogin:
+    post:
+      summary: Manually re-login to TCL
+      tags:
+        - TCL
+      responses:
+        '200':
+          description: Re-login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  status:
+                    type: number
+                  data:
+                    type: object
+                    properties:
+                      connected:
+                        type: boolean
+
+components:
+  schemas:
+    DeviceItem:
+      type: object
+      properties:
+        deviceId:
+          type: string
+        deviceName:
+          type: string
+        nickName:
+          type: string
+        isOnline:
+          type: string
+        deviceType:
+          type: string
+        mac:
+          type: string
+    DeviceState:
+      type: object
+      properties:
+        powerSwitch:
+          type: number
+        targetTemperature:
+          type: number
+        currentTemperature:
+          type: number
+        windSpeed7Gear:
+          type: number
+        workMode:
+          type: number
+        lastUpdated:
+          type: number

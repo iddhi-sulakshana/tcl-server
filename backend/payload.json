@@ -1,0 +1,492 @@
+{
+  "state": {
+    "desired": {
+      "powerSwitch": 0,
+      "targetTemperature": 31,
+      "currentTemperature": 33.9,
+      "windSpeed7Gear": 7,
+      "verticalWind": 0,
+      "horizontalWind": 0,
+      "horizontalDirection": 8,
+      "verticalDirection": 12,
+      "workMode": 3,
+      "AIECOSwitch": 0,
+      "regularReporting": 1,
+      "selfClean": 0,
+      "screen": 1,
+      "targetFahrenheitTemp": 88,
+      "temperatureType": 0,
+      "sleep": 0,
+      "beepSwitch": 1,
+      "softWind": 0,
+      "antiMoldew": 0,
+      "generatorMode": 1,
+      "filterBlockStatus": 0,
+      "errorCode": [],
+      "internalUnitCoilTemperature": 34,
+      "capabilities": [
+        2,
+        3,
+        7,
+        8,
+        9,
+        11,
+        12,
+        13,
+        23,
+        31,
+        33,
+        34,
+        39,
+        40,
+        41,
+        42,
+        48
+      ],
+      "PTCStatus": 0,
+      "ECO": 0,
+      "windSpeedPercentage": 100,
+      "windSpeedAutoSwitch": 0,
+      "selfCleanStatus": 6,
+      "selfCleanPercentage": 0,
+      "healthy": 0,
+      "AIECOStatus": 0,
+      "OutDoorCompTarFreqSet": 0,
+      "OutDoorFanTarSpeed": 0,
+      "OutDoorEEVTarOpenDegree": 0,
+      "OutDoorCompTarFreqRun": 0,
+      "eightAddHot": 0,
+      "lowerTemperatureLimit": 16,
+      "upperTemperatureLimit": 31,
+      "highTemperatureWind": 0,
+      "coolFeelWind": 0,
+      "externalUnitTemperature": 34,
+      "externalUnitFanSpeed": 0
+    },
+    "reported": {
+      "powerSwitch": 0,
+      "targetTemperature": 31,
+      "currentTemperature": 33.9,
+      "windSpeed7Gear": 7,
+      "verticalWind": 0,
+      "horizontalWind": 0,
+      "horizontalDirection": 8,
+      "verticalDirection": 12,
+      "workMode": 3,
+      "AIECOSwitch": 0,
+      "regularReporting": 1,
+      "selfClean": 0,
+      "screen": 1,
+      "targetFahrenheitTemp": 88,
+      "temperatureType": 0,
+      "sleep": 0,
+      "beepSwitch": 1,
+      "softWind": 0,
+      "antiMoldew": 0,
+      "generatorMode": 1,
+      "filterBlockStatus": 0,
+      "errorCode": [],
+      "internalUnitCoilTemperature": 34,
+      "capabilities": [
+        2,
+        3,
+        7,
+        8,
+        9,
+        11,
+        12,
+        13,
+        23,
+        31,
+        33,
+        34,
+        39,
+        40,
+        41,
+        42,
+        48
+      ],
+      "PTCStatus": 0,
+      "ECO": 0,
+      "windSpeedPercentage": 100,
+      "windSpeedAutoSwitch": 0,
+      "selfCleanStatus": 6,
+      "selfCleanPercentage": 0,
+      "healthy": 0,
+      "AIECOStatus": 0,
+      "OutDoorCompTarFreqSet": 0,
+      "OutDoorFanTarSpeed": 0,
+      "OutDoorEEVTarOpenDegree": 0,
+      "OutDoorCompTarFreqRun": 0,
+      "eightAddHot": 0,
+      "lowerTemperatureLimit": 16,
+      "upperTemperatureLimit": 31,
+      "highTemperatureWind": 0,
+      "coolFeelWind": 0,
+      "externalUnitTemperature": 34,
+      "externalUnitFanSpeed": 0
+    }
+  },
+  "metadata": {
+    "desired": {
+      "powerSwitch": {
+        "timestamp": 1775396463
+      },
+      "targetTemperature": {
+        "timestamp": 1775396104
+      },
+      "currentTemperature": {
+        "timestamp": 1775399396
+      },
+      "windSpeed7Gear": {
+        "timestamp": 1775396104
+      },
+      "verticalWind": {
+        "timestamp": 1775396104
+      },
+      "horizontalWind": {
+        "timestamp": 1775396104
+      },
+      "horizontalDirection": {
+        "timestamp": 1775396104
+      },
+      "verticalDirection": {
+        "timestamp": 1775396104
+      },
+      "workMode": {
+        "timestamp": 1775396104
+      },
+      "AIECOSwitch": {
+        "timestamp": 1775396104
+      },
+      "regularReporting": {
+        "timestamp": 1775396104
+      },
+      "selfClean": {
+        "timestamp": 1775396104
+      },
+      "screen": {
+        "timestamp": 1775396104
+      },
+      "targetFahrenheitTemp": {
+        "timestamp": 1775396104
+      },
+      "temperatureType": {
+        "timestamp": 1775396104
+      },
+      "sleep": {
+        "timestamp": 1775396105
+      },
+      "beepSwitch": {
+        "timestamp": 1775396105
+      },
+      "softWind": {
+        "timestamp": 1775396105
+      },
+      "antiMoldew": {
+        "timestamp": 1775396105
+      },
+      "generatorMode": {
+        "timestamp": 1775396105
+      },
+      "filterBlockStatus": {
+        "timestamp": 1775396105
+      },
+      "errorCode": [],
+      "internalUnitCoilTemperature": {
+        "timestamp": 1775399390
+      },
+      "capabilities": [
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        }
+      ],
+      "PTCStatus": {
+        "timestamp": 1775396105
+      },
+      "ECO": {
+        "timestamp": 1775396105
+      },
+      "windSpeedPercentage": {
+        "timestamp": 1775396105
+      },
+      "windSpeedAutoSwitch": {
+        "timestamp": 1775396105
+      },
+      "selfCleanStatus": {
+        "timestamp": 1775396105
+      },
+      "selfCleanPercentage": {
+        "timestamp": 1775396105
+      },
+      "healthy": {
+        "timestamp": 1775396105
+      },
+      "AIECOStatus": {
+        "timestamp": 1775396105
+      },
+      "OutDoorCompTarFreqSet": {
+        "timestamp": 1775396105
+      },
+      "OutDoorFanTarSpeed": {
+        "timestamp": 1775396105
+      },
+      "OutDoorEEVTarOpenDegree": {
+        "timestamp": 1775396105
+      },
+      "OutDoorCompTarFreqRun": {
+        "timestamp": 1775396105
+      },
+      "eightAddHot": {
+        "timestamp": 1775396105
+      },
+      "lowerTemperatureLimit": {
+        "timestamp": 1775396105
+      },
+      "upperTemperatureLimit": {
+        "timestamp": 1775396105
+      },
+      "highTemperatureWind": {
+        "timestamp": 1775396105
+      },
+      "coolFeelWind": {
+        "timestamp": 1775396105
+      },
+      "externalUnitTemperature": {
+        "timestamp": 1775386293
+      },
+      "externalUnitFanSpeed": {
+        "timestamp": 1775386250
+      }
+    },
+    "reported": {
+      "powerSwitch": {
+        "timestamp": 1775396463
+      },
+      "targetTemperature": {
+        "timestamp": 1775396104
+      },
+      "currentTemperature": {
+        "timestamp": 1775399396
+      },
+      "windSpeed7Gear": {
+        "timestamp": 1775396104
+      },
+      "verticalWind": {
+        "timestamp": 1775396104
+      },
+      "horizontalWind": {
+        "timestamp": 1775396104
+      },
+      "horizontalDirection": {
+        "timestamp": 1775396104
+      },
+      "verticalDirection": {
+        "timestamp": 1775396104
+      },
+      "workMode": {
+        "timestamp": 1775396104
+      },
+      "AIECOSwitch": {
+        "timestamp": 1775396104
+      },
+      "regularReporting": {
+        "timestamp": 1775396104
+      },
+      "selfClean": {
+        "timestamp": 1775396104
+      },
+      "screen": {
+        "timestamp": 1775396104
+      },
+      "targetFahrenheitTemp": {
+        "timestamp": 1775396104
+      },
+      "temperatureType": {
+        "timestamp": 1775396104
+      },
+      "sleep": {
+        "timestamp": 1775396105
+      },
+      "beepSwitch": {
+        "timestamp": 1775396105
+      },
+      "softWind": {
+        "timestamp": 1775396105
+      },
+      "antiMoldew": {
+        "timestamp": 1775396105
+      },
+      "generatorMode": {
+        "timestamp": 1775396105
+      },
+      "filterBlockStatus": {
+        "timestamp": 1775396105
+      },
+      "errorCode": [],
+      "internalUnitCoilTemperature": {
+        "timestamp": 1775399390
+      },
+      "capabilities": [
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        },
+        {
+          "timestamp": 1775396105
+        }
+      ],
+      "PTCStatus": {
+        "timestamp": 1775396105
+      },
+      "ECO": {
+        "timestamp": 1775396105
+      },
+      "windSpeedPercentage": {
+        "timestamp": 1775396105
+      },
+      "windSpeedAutoSwitch": {
+        "timestamp": 1775396105
+      },
+      "selfCleanStatus": {
+        "timestamp": 1775396105
+      },
+      "selfCleanPercentage": {
+        "timestamp": 1775396105
+      },
+      "healthy": {
+        "timestamp": 1775396105
+      },
+      "AIECOStatus": {
+        "timestamp": 1775396105
+      },
+      "OutDoorCompTarFreqSet": {
+        "timestamp": 1775396105
+      },
+      "OutDoorFanTarSpeed": {
+        "timestamp": 1775396105
+      },
+      "OutDoorEEVTarOpenDegree": {
+        "timestamp": 1775396105
+      },
+      "OutDoorCompTarFreqRun": {
+        "timestamp": 1775396105
+      },
+      "eightAddHot": {
+        "timestamp": 1775396105
+      },
+      "lowerTemperatureLimit": {
+        "timestamp": 1775396105
+      },
+      "upperTemperatureLimit": {
+        "timestamp": 1775396105
+      },
+      "highTemperatureWind": {
+        "timestamp": 1775396105
+      },
+      "coolFeelWind": {
+        "timestamp": 1775396105
+      },
+      "externalUnitTemperature": {
+        "timestamp": 1775386293
+      },
+      "externalUnitFanSpeed": {
+        "timestamp": 1775386250
+      }
+    }
+  },
+  "version": 21828,
+  "timestamp": 1775399434
+}
