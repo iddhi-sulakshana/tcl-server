@@ -48,6 +48,7 @@ export const tclDeviceStateResponseSchema = z.object({
     softWind: z.number().optional(),
     antiMoldew: z.number().optional(),
     ECO: z.number().optional(),
+    generatorMode: z.number().optional(),
     healthy: z.number().optional(),
     errorCode: z.array(z.number()).optional(),
     lastUpdated: z.number().optional(),

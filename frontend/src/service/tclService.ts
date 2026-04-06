@@ -29,8 +29,10 @@ export const useDevices = () => {
         queryKey: ["tcl-devices"],
         queryFn: async () => {
             const response = await ApiClient.get<ApiResponse<DeviceItem[]>>("/tcl/devices");
-            return response.data.data;
+            const devices = response.data.data;
+            return devices.sort((a, b) => a.nickName.localeCompare(b.nickName));
         },
+        refetchInterval: 60000,
     });
 };
 

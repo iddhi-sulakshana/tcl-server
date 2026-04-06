@@ -72,6 +72,7 @@ export async function getDeviceStateService(
             softWind: reported.softWind,
             antiMoldew: reported.antiMoldew,
             ECO: reported.ECO,
+            generatorMode: reported.generatorMode,
             healthy: reported.healthy,
             errorCode: reported.errorCode,
             lastUpdated: state.lastUpdated,

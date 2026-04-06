@@ -1,10 +1,10 @@
 import { useBulkUpdate } from "@/service/tclService";
 import { useSelectionStore } from "@/lib/SelectionStore";
-import { Power, RefreshCcw, Snowflake, Wind, CheckCircle2, Trash2 } from "lucide-react";
+import { Power, RefreshCcw, Snowflake, Wind } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const GlobalControls = () => {
-    const { selectedDeviceIds, clearSelection } = useSelectionStore();
+    const { selectedDeviceIds } = useSelectionStore();
     const bulkUpdate = useBulkUpdate();
 
     const hasSelection = selectedDeviceIds.length > 0;
@@ -24,9 +24,13 @@ const GlobalControls = () => {
     };
 
     const handleBulkMode = (mode: number) => {
+        const properties: any = { workMode: mode };
+        if (mode === 1) properties.targetTemperature = 16;
+        if (mode === 3) properties.targetTemperature = 31;
+
         bulkUpdate.mutate({
             deviceIds: selectedDeviceIds,
-            properties: { workMode: mode },
+            properties,
         });
     };
 
@@ -48,19 +52,6 @@ const GlobalControls = () => {
                 >
                     <div className="master-bar-glass rounded-full px-12 py-6 flex flex-wrap justify-center items-center gap-12 shadow-[0px_20px_60px_rgba(0,0,0,0.4),0px_0px_20px_rgba(94,180,255,0.1)]">
                         
-                        {/* Selection Badge & Clear */}
-                        <div className="flex flex-col items-center gap-2">
-                             <span className="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase opacity-60">Selection</span>
-                             <div className="flex items-center gap-3">
-                                <div className="bg-primary/20 text-primary px-3 py-1.5 rounded-lg flex items-center gap-2 font-bold text-xs ring-1 ring-primary/30">
-                                    <CheckCircle2 size={14} />
-                                    {selectedDeviceIds.length}
-                                </div>
-                                <button onClick={clearSelection} className="text-on-surface-variant hover:text-secondary transition-colors">
-                                    <Trash2 size={20} />
-                                </button>
-                             </div>
-                        </div>
 
                         {/* Power Controls */}
                         <div className="space-y-2">
@@ -88,7 +79,8 @@ const GlobalControls = () => {
                                 {[
                                     { id: 0, label: "Off" },
                                     { id: 1, label: "Lvl 1" },
-                                    { id: 2, label: "Lvl 2" }
+                                    { id: 2, label: "Lvl 2" },
+                                    { id: 3, label: "Lvl 3" }
                                 ].map((g) => (
                                     <button 
                                         key={g.id}

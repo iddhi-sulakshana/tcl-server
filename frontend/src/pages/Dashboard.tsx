@@ -66,12 +66,6 @@ const Dashboard = () => {
                         >
                             <LogOut size={20} />
                         </button>
-
-                        <img 
-                            alt="User profile avatar" 
-                            className="w-10 h-10 rounded-full border border-primary/20" 
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsY3T4bMxP2szz_14sVmRJQckkyRrNTU0RiLAH0fsDmz7HTAihMhvh5idT7c68VusS0gu8gXCFn4XKseQF3pSAFs0EmMAjaBfONJAjSzo2GIQcSXWFRVdbp0G3jgcPNnpGhGjhv9J5x68JF89c1iHJYXs9gsBhuFi2E5AoMHpDdUvLTkeh7MMthND251rCVYpTrSNKZejH7bD4RqvEpyIocnus2tpubWAgo9WdjA6y-xtYfqqwp7LhAu32ETAUltbha13drDQgAg"
-                        />
                     </div>
                 </div>
             </header>

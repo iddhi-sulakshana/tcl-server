@@ -105,7 +105,6 @@ export default class TCL {
                 throw new Error("Unknown error");
             }
 
-            this.connected = true;
             this.username = response.data.user.username;
             this.token = response.data.token;
             this.countryAbbr = response.data.user.countryAbbr;
@@ -238,6 +237,8 @@ export default class TCL {
                 },
                 endpoint: `https://data-ats.iot.${this.cloudRegion}.amazonaws.com`,
             })
+
+            this.connected = true;
 
             winston.info("TCL: Get AWS Credintials successful");
         } catch (error) {

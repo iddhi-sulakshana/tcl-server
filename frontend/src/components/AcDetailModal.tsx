@@ -3,6 +3,7 @@ import { X, ChevronUp, ChevronDown, Wind, Snowflake, Droplets, RefreshCcw, Zap, 
 import { useDeviceState, useUpdateDeviceState } from "@/service/tclService";
 import type { DeviceItem } from "@/types/tcl";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface AcDetailModalProps {
     device: DeviceItem;
@@ -11,10 +12,15 @@ interface AcDetailModalProps {
 }
 
 const AcDetailModal = ({ device, isOpen, onClose }: AcDetailModalProps) => {
-    const { data: state } = useDeviceState(device.deviceId, isOpen);
+    const isOnline = device.isOnline === "1";
+    const { data: state } = useDeviceState(device.deviceId, isOpen && isOnline);
     const updateState = useUpdateDeviceState();
 
     const handleUpdate = (properties: any) => {
+        if (!isOnline) {
+            toast.error("Device is offline. Configuration unavailable.");
+            return;
+        }
         updateState.mutate({ deviceId: device.deviceId, properties });
     };
 
@@ -30,7 +36,7 @@ const AcDetailModal = ({ device, isOpen, onClose }: AcDetailModalProps) => {
         { id: 0, name: "Off", desc: "100%" },
         { id: 1, name: "Lvl 1", desc: "30%" },
         { id: 2, name: "Lvl 2", desc: "50%" },
-        { id: 3, name: "Lvl 3", desc: "70%" },
+        { id: 3, name: "Lvl 3", desc: "80%" },
     ];
 
     const FAN_SPEEDS = [
@@ -145,7 +151,12 @@ const AcDetailModal = ({ device, isOpen, onClose }: AcDetailModalProps) => {
                                     {MODES.map((mode) => (
                                         <button
                                             key={mode.id}
-                                            onClick={() => handleUpdate({ workMode: mode.id })}
+                                            onClick={() => {
+                                                const properties: any = { workMode: mode.id };
+                                                if (mode.id === 1) properties.targetTemperature = 16;
+                                                if (mode.id === 3) properties.targetTemperature = 31;
+                                                handleUpdate(properties);
+                                            }}
                                             className={cn(
                                                 "flex flex-col items-center gap-1.5 p-3 rounded-2xl transition-all",
                                                 state?.workMode === mode.id 
