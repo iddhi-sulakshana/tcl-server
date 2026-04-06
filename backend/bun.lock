@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "growattserver",
+      "name": "tclserver",
       "dependencies": {
         "@aws-sdk/client-iot-data-plane": "^3.1024.0",
         "@scalar/express-api-reference": "^0.8.30",

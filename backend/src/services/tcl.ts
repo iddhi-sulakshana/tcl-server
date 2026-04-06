@@ -489,7 +489,7 @@ export default class TCL {
             clearInterval(this.refreshInterval);
         }
 
-        // Set up hourly refresh (900000 ms = 15 minutes)
+        // Set up refresh interval (3,600,000 ms = 1 hour)
         this.refreshInterval = setInterval(async () => {
             winston.info("TCL: Login interval triggered");
             try {
@@ -507,7 +507,7 @@ export default class TCL {
                     `TCL: Login interval failed: ${error.message || error}`
                 );
             }
-        }, 900000); // 15 minutes in milliseconds
+        }, 3600000); // 1 hour in milliseconds
 
         winston.info("TCL: Login interval started");
     }

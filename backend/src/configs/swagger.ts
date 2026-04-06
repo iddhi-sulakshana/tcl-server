@@ -16,9 +16,9 @@ export default function configSwagger(app: Express) {
             const swaggerSpecs: any = {
                 openapi: "3.1.1",
                 info: {
-                    title: "Growatt Server",
+                    title: "TCL Server",
                     version: "1.0.0",
-                    description: "Complete API reference for Growatt Server",
+                    description: "Complete API reference for TCL Server",
                     ogDescription:
                         "Comprehensive API documentation with interactive client",
                 },
@@ -50,9 +50,9 @@ export default function configSwagger(app: Express) {
                     path.join(routesDir, route, "swagger.yaml")
                 )
                     ? fs.readFileSync(
-                          path.join(routesDir, route, "swagger.yaml"),
-                          "utf8"
-                      )
+                        path.join(routesDir, route, "swagger.yaml"),
+                        "utf8"
+                    )
                     : null;
                 if (!swaggerFile) return;
 
@@ -85,7 +85,7 @@ export default function configSwagger(app: Express) {
                     targetKey: "js",
                     clientKey: "axios",
                 },
-                pageTitle: "Growatt Server API Reference",
+                pageTitle: "TCL Server API Reference",
                 hideModels: true,
                 layout: "modern",
                 hideDownloadButton: false,
