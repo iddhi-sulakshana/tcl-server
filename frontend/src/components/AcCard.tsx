@@ -1,7 +1,7 @@
 import React from "react";
 import { useDeviceState, useUpdateDeviceState } from "@/service/tclService";
 import type { DeviceItem } from "@/types/tcl";
-import { Wind, Snowflake, Droplets, Sun, ChevronUp, ChevronDown, Check, Zap, Power } from "lucide-react";
+import { Wind, Snowflake, Droplets, Sun, ChevronUp, ChevronDown, Check, Power } from "lucide-react";
 import { useSelectionStore } from "@/lib/SelectionStore";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
