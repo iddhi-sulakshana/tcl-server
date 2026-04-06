@@ -1,26 +1,27 @@
-import ErrorDisplay from '@/components/layout/ErrorDisplay';
-import ProtectedItem from '@/components/layout/ProtectedItem';
-import { Button } from '@/components/ui/button';
-import { useAuthStore } from '@/stores/Auth.store';
-import { Navigate, NavLink, Outlet, useRouteError } from 'react-router';
+import TotalMetrics from "@/components/TotalMetrics";
+import SystemDiagram from "@/components/SystemDiagram";
+import ActionButton from "@/components/ActionButton";
+import BatteryMaxChargeModal from "@/components/BatteryMaxChargeModal";
+import AcOutputSourceModal from "@/components/AcOutputSourceModal";
 
-export default function Dashboard() {
-  const error = useRouteError();
-  const { logout, token } = useAuthStore();
+const Dashboard = () => {
+    return (
+        <main className="bg-gray-100 dark:bg-background min-h-screen h-screen w-screen flex md:items-center md:justify-center overflow-y-auto md:overflow-hidden relative">
+            <ActionButton />
+            <BatteryMaxChargeModal />
+            <AcOutputSourceModal />
+            <div className="flex flex-col md:flex-row md:items-center md:justify-center h-full w-full gap-2 p-4 pt-16 md:pt-4">
+                <div className="h-full w-full flex md:items-center md:justify-center flex-col gap-4">
+                    <div className="aspect-square w-full border-4 border-gray-500 dark:border-border rounded-lg h-full bg-card dark:bg-card">
+                        <SystemDiagram />
+                    </div>
+                </div>
+                <div className="w-full md:h-full relative grid grid-cols-2 md:grid-cols-2 gap-2 md:gap-2">
+                    <TotalMetrics />
+                </div>
+            </div>
+        </main>
+    );
+};
 
-  if (!token) return <Navigate to='/sign-in' replace />;
-
-  return (
-    <div className='h-full'>
-      <h1>Dashboard</h1>
-      <Button onClick={logout}>Sign out</Button>
-      <ProtectedItem roles={['admin']}>
-        <NavLink to='/dashboard/admin-only'>Admin Only</NavLink>
-      </ProtectedItem>
-      <NavLink to='/dashboard/anyone'>Anyone</NavLink>
-      <div className='bg-accent h-full w-full'>
-        {error ? <ErrorDisplay error={error} /> : <Outlet />}
-      </div>
-    </div>
-  );
-}
+export default Dashboard;
