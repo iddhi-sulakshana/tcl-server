@@ -32,9 +32,19 @@ const AcCard = ({ device, onClick }: AcCardProps) => {
     const handleTempChange = (e: React.MouseEvent, delta: number) => {
         e.stopPropagation();
         if (!checkOnline() || !state) return;
+        const newTemp = Math.min(31, Math.max(16, state.targetTemperature + delta));
         updateState.mutate({
             deviceId: device.deviceId,
-            properties: { targetTemperature: state.targetTemperature + delta },
+            properties: { targetTemperature: newTemp },
+        });
+    };
+
+    const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!checkOnline() || !state) return;
+        const val = parseInt(e.target.value);
+        updateState.mutate({
+            deviceId: device.deviceId,
+            properties: { targetTemperature: val },
         });
     };
 
@@ -113,7 +123,7 @@ const AcCard = ({ device, onClick }: AcCardProps) => {
             </div>
 
             {/* Header Info */}
-            <div className="flex justify-between items-start mb-4">
+            <div className="flex justify-between items-start mb-1">
                 <div className="pl-10">
                     <h3 className="text-xl font-heading font-bold text-on-surface line-clamp-1">
                         {device.nickName}
@@ -147,27 +157,47 @@ const AcCard = ({ device, onClick }: AcCardProps) => {
                 </button>
             </div>
 
-            {/* Temperature Readout */}
-            <div className="flex items-center justify-center gap-10 mb-5">
-                <button 
-                    onClick={(e) => handleTempChange(e, -1)}
-                    className="w-12 h-12 rounded-full border border-primary/20 flex items-center justify-center hover:bg-primary/20 transition-all active:scale-90 text-on-surface/60 hover:text-primary pointer-events-auto"
-                >
-                    <ChevronDown size={24} />
-                </button>
-                
-                <div className="text-center relative">
-                    <div className="text-[5rem] leading-none font-heading font-bold text-transparent bg-clip-text bg-gradient-to-b from-primary to-primary-dim">
-                        {isOnline ? (state?.targetTemperature ?? "--") : "--"}°
+            {/* Temperature Readout & Slider */}
+            <div className="flex flex-col items-center mb-1 w-full group/temp">
+                <div className="flex items-center justify-center gap-5 mb-1 w-full">
+                    <button 
+                        onClick={(e) => handleTempChange(e, -1)}
+                        className="w-8 h-8 rounded-full border border-primary/20 flex items-center justify-center hover:bg-primary/20 transition-all active:scale-90 text-on-surface/60 hover:text-primary pointer-events-auto"
+                    >
+                        <ChevronDown size={24} />
+                    </button>
+                    
+                    <div className="text-center relative min-w-[3ch]">
+                        <div className="text-6xl leading-none font-heading font-bold text-transparent bg-clip-text bg-gradient-to-b from-primary to-primary-dim">
+                            {isOnline ? (state?.targetTemperature ?? "--") : "--"}
+                        </div>
                     </div>
+
+                    <button 
+                        onClick={(e) => handleTempChange(e, 1)}
+                        className="w-8 h-8 rounded-full border border-primary/20 flex items-center justify-center hover:bg-primary/20 transition-all active:scale-90 text-on-surface/60 hover:text-primary pointer-events-auto"
+                    >
+                        <ChevronUp size={24} />
+                    </button>
                 </div>
 
-                <button 
-                    onClick={(e) => handleTempChange(e, 1)}
-                    className="w-12 h-12 rounded-full border border-primary/20 flex items-center justify-center hover:bg-primary/20 transition-all active:scale-90 text-on-surface/60 hover:text-primary pointer-events-auto"
-                >
-                    <ChevronUp size={24} />
-                </button>
+                {/* Range Slider */}
+                <div className="w-full px-2 pointer-events-auto">
+                    <input
+                        type="range"
+                        min="16"
+                        max="31"
+                        step="1"
+                        value={state?.targetTemperature ?? 16}
+                        onChange={handleSliderChange}
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-gradient-to-r from-primary to-secondary accent-white [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white/50 transition-all"
+                    />
+                    <div className="flex justify-between mt-1 px-0.5">
+                        <span className="text-[9px] font-black tracking-widest text-on-surface-variant/30 uppercase">16</span>
+                        <span className="text-[9px] font-black tracking-widest text-on-surface-variant/30 uppercase">31</span>
+                    </div>
+                </div>
             </div>
 
             {/* Quick Controls Grid */}
