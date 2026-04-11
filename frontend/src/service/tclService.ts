@@ -1,5 +1,5 @@
 import ApiClient from "@/lib/ApiClient";
-import type { ApiResponse, DeviceItem, DeviceState, TclReloginResponse } from "@/types/tcl";
+import type { ApiResponse, DeviceWithState, DeviceState, TclReloginResponse } from "@/types/tcl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAuthStore } from "@/lib/AuthStore";
@@ -23,16 +23,16 @@ export const useLogin = () => {
     });
 };
 
-// Fetch all devices
+// Fetch all devices with their states merged
 export const useDevices = () => {
     return useQuery({
         queryKey: ["tcl-devices"],
         queryFn: async () => {
-            const response = await ApiClient.get<ApiResponse<DeviceItem[]>>("/tcl/devices");
+            const response = await ApiClient.get<ApiResponse<DeviceWithState[]>>("/tcl/devices");
             const devices = response.data.data;
             return devices.sort((a, b) => a.nickName.localeCompare(b.nickName));
         },
-        refetchInterval: 60000,
+        refetchInterval: 10000,
     });
 };
 
@@ -64,8 +64,14 @@ export const useUpdateDeviceState = () => {
         onSuccess: async (_, { deviceId }) => {
             // Wait for 1 second to allow the TCL cloud to update its shadow/state
             await new Promise((resolve) => setTimeout(resolve, 1000));
-            await queryClient.invalidateQueries({ queryKey: ["tcl-device-state", deviceId] });
-            await queryClient.refetchQueries({ queryKey: ["tcl-device-state", deviceId] });
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: ["tcl-device-state", deviceId] }),
+                queryClient.invalidateQueries({ queryKey: ["tcl-devices"] }),
+            ]);
+            await Promise.all([
+                queryClient.refetchQueries({ queryKey: ["tcl-device-state", deviceId] }),
+                queryClient.refetchQueries({ queryKey: ["tcl-devices"] }),
+            ]);
             toast.success("Settings updated");
         },
         onError: (error: any) => {

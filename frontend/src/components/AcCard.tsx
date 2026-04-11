@@ -1,25 +1,34 @@
-import React from "react";
-import { useDeviceState, useUpdateDeviceState } from "@/service/tclService";
-import type { DeviceItem } from "@/types/tcl";
-import { Wind, Snowflake, Droplets, Sun, ChevronUp, ChevronDown, Check, Power } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { useUpdateDeviceState } from "@/service/tclService";
+import type { DeviceWithState } from "@/types/tcl";
+import { Wind, Snowflake, Droplets, Sun, ChevronUp, ChevronDown, Check, Power, AirVent, WashingMachine, Fan } from "lucide-react";
 import { useSelectionStore } from "@/lib/SelectionStore";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface AcCardProps {
-    device: DeviceItem;
+    device: DeviceWithState;
     onClick: () => void;
 }
 
 const AcCard = ({ device, onClick }: AcCardProps) => {
     const isOnline = device.isOnline === "1";
-    const { data: state, isLoading } = useDeviceState(device.deviceId, isOnline);
+    const state = device.state;
     const updateState = useUpdateDeviceState();
     const { selectedDeviceIds, toggleDevice } = useSelectionStore();
 
     const isSelected = selectedDeviceIds.includes(device.deviceId);
     const isOn = state?.powerSwitch === 1;
+
+    const [localTemp, setLocalTemp] = useState<number | null>(null);
+    const debounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(() => {
+        if (state?.targetTemperature && !debounceTimeout.current) {
+            setLocalTemp(state.targetTemperature);
+        }
+    }, [state?.targetTemperature]);
 
     const checkOnline = () => {
         if (!isOnline) {
@@ -32,20 +41,28 @@ const AcCard = ({ device, onClick }: AcCardProps) => {
     const handleTempChange = (e: React.MouseEvent, delta: number) => {
         e.stopPropagation();
         if (!checkOnline() || !state) return;
-        const newTemp = Math.min(31, Math.max(16, state.targetTemperature + delta));
-        updateState.mutate({
-            deviceId: device.deviceId,
-            properties: { targetTemperature: newTemp },
-        });
+        const currentTemp = localTemp ?? state.targetTemperature;
+        const newTemp = Math.min(31, Math.max(16, currentTemp + delta));
+        setLocalTemp(newTemp);
+        
+        if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+        debounceTimeout.current = setTimeout(() => {
+            updateState.mutate({ deviceId: device.deviceId, properties: { targetTemperature: newTemp } });
+            debounceTimeout.current = null;
+        }, 300);
     };
 
     const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.stopPropagation();
         if (!checkOnline() || !state) return;
         const val = parseInt(e.target.value);
-        updateState.mutate({
-            deviceId: device.deviceId,
-            properties: { targetTemperature: val },
-        });
+        setLocalTemp(val);
+
+        if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+        debounceTimeout.current = setTimeout(() => {
+            updateState.mutate({ deviceId: device.deviceId, properties: { targetTemperature: val } });
+            debounceTimeout.current = null;
+        }, 500);
     };
 
     const handleModeChange = (e: React.MouseEvent, mode: number) => {
@@ -53,8 +70,8 @@ const AcCard = ({ device, onClick }: AcCardProps) => {
         if (!checkOnline()) return;
 
         const properties: any = { workMode: mode };
-        if (mode === 1) properties.targetTemperature = 16;
-        if (mode === 3) properties.targetTemperature = 31;
+        if (mode === 1 || mode === 2) properties.targetTemperature = 16;
+        if (mode === 3 || mode === 4) properties.targetTemperature = 31;
 
         updateState.mutate({
             deviceId: device.deviceId,
@@ -94,12 +111,6 @@ const AcCard = ({ device, onClick }: AcCardProps) => {
         toggleDevice(device.deviceId);
     };
 
-    if (isLoading && isOnline) {
-        return (
-            <div className="w-full h-80 glass-card animate-pulse rounded-[2rem]" />
-        );
-    }
-
     return (
         <motion.div
             whileHover={isOnline ? { y: -8 } : {}}
@@ -136,8 +147,18 @@ const AcCard = ({ device, onClick }: AcCardProps) => {
                         <span className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant flex items-center gap-2">
                             {isOnline ? "System Active" : "DISCONNECTED"}
                             {isOnline && state?.currentTemperature && (
-                                <span className="text-primary font-bold">
-                                    • {state.currentTemperature}°C
+                                <span className="text-primary font-bold flex items-center gap-1 flex-wrap">
+                                    <AirVent size={12} /> {state.currentTemperature}°C
+                                    {state?.externalUnitTemperature !== undefined && (
+                                        <span className="text-orange-500 flex items-center gap-1">
+                                            &nbsp;&nbsp;<WashingMachine size={12} /> {state.externalUnitTemperature}°C
+                                            {state?.externalUnitFanSpeed !== undefined && (
+                                                <>
+                                                    &nbsp;&nbsp;<Fan size={12} /> {state.externalUnitFanSpeed}
+                                                </>
+                                            )}
+                                        </span>
+                                    )}
                                 </span>
                             )}
                         </span>
@@ -168,8 +189,11 @@ const AcCard = ({ device, onClick }: AcCardProps) => {
                     </button>
                     
                     <div className="text-center relative min-w-[3ch]">
-                        <div className="text-6xl leading-none font-heading font-bold text-transparent bg-clip-text bg-gradient-to-b from-primary to-primary-dim">
-                            {isOnline ? (state?.targetTemperature ?? "--") : "--"}
+                        <div className={cn(
+                            "text-6xl leading-none font-heading font-bold text-transparent bg-clip-text bg-gradient-to-b",
+                            state?.workMode === 4 ? "from-orange-400 to-orange-600" : "from-primary to-primary-dim"
+                        )}>
+                            {isOnline ? (localTemp ?? state?.targetTemperature ?? "--") : "--"}
                         </div>
                     </div>
 
@@ -188,10 +212,13 @@ const AcCard = ({ device, onClick }: AcCardProps) => {
                         min="16"
                         max="31"
                         step="1"
-                        value={state?.targetTemperature ?? 16}
+                        value={localTemp ?? state?.targetTemperature ?? 16}
                         onChange={handleSliderChange}
                         onClick={(e) => e.stopPropagation()}
-                        className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-gradient-to-r from-primary to-secondary accent-white [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white/50 transition-all"
+                        className={cn(
+                            "w-full h-1.5 rounded-full appearance-none cursor-pointer accent-white [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white/50 transition-all",
+                            state?.workMode === 4 ? "bg-gradient-to-r from-orange-400 to-orange-600" : "bg-gradient-to-r from-primary to-secondary"
+                        )}
                     />
                     <div className="flex justify-between mt-1 px-0.5">
                         <span className="text-[9px] font-black tracking-widest text-on-surface-variant/30 uppercase">16</span>

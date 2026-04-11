@@ -28,8 +28,8 @@ const GlobalControls = () => {
 
     const handleBulkMode = (mode: number) => {
         const properties: any = { workMode: mode };
-        if (mode === 1) properties.targetTemperature = 16;
-        if (mode === 3) properties.targetTemperature = 31;
+        if (mode === 1 || mode === 2) properties.targetTemperature = 16;
+        if (mode === 3 || mode === 4) properties.targetTemperature = 31;
 
         bulkUpdate.mutate({
             deviceIds: targetDeviceIds,

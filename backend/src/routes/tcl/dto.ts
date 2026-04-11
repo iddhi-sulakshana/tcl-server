@@ -21,6 +21,27 @@ export const reloginResponseSchema = z.object({
 
 export type TclReloginResponse = z.infer<typeof reloginResponseSchema>;
 
+export const tclDeviceStateResponseSchema = z.object({
+    powerSwitch: z.number().optional(),
+    targetTemperature: z.number().optional(),
+    currentTemperature: z.number().optional(),
+    windSpeed7Gear: z.number().optional(),
+    verticalDirection: z.number().optional(),
+    horizontalDirection: z.number().optional(),
+    workMode: z.number().optional(),
+    screen: z.number().optional(),
+    sleep: z.number().optional(),
+    beepSwitch: z.number().optional(),
+    softWind: z.number().optional(),
+    antiMoldew: z.number().optional(),
+    ECO: z.number().optional(),
+    healthy: z.number().optional(),
+    externalUnitTemperature: z.number().optional(),
+    externalUnitFanSpeed: z.number().optional(),
+});
+
+export type TclDeviceStateResponse = z.infer<typeof tclDeviceStateResponseSchema>;
+
 export const tclDeviceListResponseItemSchema = z.object({
     deviceId: z.string(),
     deviceName: z.string(),
@@ -32,26 +53,8 @@ export const tclDeviceListResponseItemSchema = z.object({
 
 export type TclDeviceListResponseItem = z.infer<typeof tclDeviceListResponseItemSchema>;
 
-export const tclDeviceStateResponseSchema = z.object({
-    powerSwitch: z.number().optional(),
-    targetTemperature: z.number().optional(),
-    currentTemperature: z.number().optional(),
-    windSpeed7Gear: z.number().optional(),
-    verticalWind: z.number().optional(),
-    horizontalWind: z.number().optional(),
-    workMode: z.number().optional(),
-    AIECOSwitch: z.number().optional(),
-    selfClean: z.number().optional(),
-    screen: z.number().optional(),
-    sleep: z.number().optional(),
-    beepSwitch: z.number().optional(),
-    softWind: z.number().optional(),
-    antiMoldew: z.number().optional(),
-    ECO: z.number().optional(),
-    generatorMode: z.number().optional(),
-    healthy: z.number().optional(),
-    errorCode: z.array(z.number()).optional(),
-    lastUpdated: z.number().optional(),
+export const tclDeviceWithStateResponseSchema = tclDeviceListResponseItemSchema.extend({
+    state: tclDeviceStateResponseSchema.nullable().default(null),
 });
 
-export type TclDeviceStateResponse = z.infer<typeof tclDeviceStateResponseSchema>;
+export type TclDeviceWithStateResponse = z.infer<typeof tclDeviceWithStateResponseSchema>;

@@ -2,7 +2,7 @@ import { ApiError, type DataResponse } from "@/types/api-contract";
 import type {
     GetDeviceStateRequest,
     SetDeviceStateRequest,
-    TclDeviceListResponseItem,
+    TclDeviceWithStateResponse,
     TclDeviceStateResponse,
     TclReloginResponse,
 } from "./dto";
@@ -11,24 +11,57 @@ import { tcl } from "@/services/tcl-instance";
 import winston from "winston";
 
 export async function getDevicesService(): Promise<
-    DataResponse<TclDeviceListResponseItem[]>
+    DataResponse<TclDeviceWithStateResponse[]>
 > {
     try {
         const devices = await tcl.getDevicelist();
-        
-        const filteredDevices: TclDeviceListResponseItem[] = devices.map(device => ({
+
+        const onlineDevices = devices.filter(d => d.isOnline === "1");
+        const stateResults = await Promise.allSettled(
+            onlineDevices.map(d => tcl.getDeviceState({ deviceId: d.deviceId, forceRefresh: false }))
+        );
+
+        const stateMap = new Map<string, TclDeviceStateResponse>();
+        onlineDevices.forEach((device, i) => {
+            const result = stateResults[i];
+            if (result.status === "fulfilled" && result.value) {
+                const reported = result.value.state.reported;
+                stateMap.set(device.deviceId, {
+                    powerSwitch: reported.powerSwitch,
+                    targetTemperature: reported.targetTemperature,
+                    currentTemperature: reported.currentTemperature,
+                    windSpeed7Gear: reported.windSpeed7Gear,
+                    verticalDirection: reported.verticalDirection,
+                    horizontalDirection: reported.horizontalDirection,
+                    workMode: reported.workMode,
+                    screen: reported.screen,
+                    sleep: reported.sleep,
+                    beepSwitch: reported.beepSwitch,
+                    softWind: reported.softWind,
+                    antiMoldew: reported.antiMoldew,
+                    ECO: reported.ECO,
+                    generatorMode: reported.generatorMode,
+                    healthy: reported.healthy,
+                    externalUnitTemperature: reported.externalUnitTemperature,
+                    externalUnitFanSpeed: reported.externalUnitFanSpeed,
+                });
+            }
+        });
+
+        const devicesWithState: TclDeviceWithStateResponse[] = devices.map(device => ({
             deviceId: device.deviceId,
             deviceName: device.deviceName,
             nickName: device.nickName,
             isOnline: device.isOnline,
             deviceType: device.deviceType,
             mac: device.mac,
+            state: stateMap.get(device.deviceId) ?? null,
         }));
 
         return {
             message: "Device list retrieved successfully",
             status: HTTP_STATUS.OK,
-            data: filteredDevices,
+            data: devicesWithState,
         };
     } catch (error: any) {
         winston.error("TCL: Get device list failed", error);
@@ -54,18 +87,15 @@ export async function getDeviceStateService(
                 HTTP_STATUS.INTERNAL_SERVER_ERROR
             );
         }
-
         const reported = state.state.reported;
         const filteredState: TclDeviceStateResponse = {
             powerSwitch: reported.powerSwitch,
             targetTemperature: reported.targetTemperature,
             currentTemperature: reported.currentTemperature,
             windSpeed7Gear: reported.windSpeed7Gear,
-            verticalWind: reported.verticalWind,
-            horizontalWind: reported.horizontalWind,
+            verticalDirection: reported.verticalDirection,
+            horizontalDirection: reported.horizontalDirection,
             workMode: reported.workMode,
-            AIECOSwitch: reported.AIECOSwitch,
-            selfClean: reported.selfClean,
             screen: reported.screen,
             sleep: reported.sleep,
             beepSwitch: reported.beepSwitch,
@@ -74,8 +104,8 @@ export async function getDeviceStateService(
             ECO: reported.ECO,
             generatorMode: reported.generatorMode,
             healthy: reported.healthy,
-            errorCode: reported.errorCode,
-            lastUpdated: state.lastUpdated,
+            externalUnitTemperature: reported.externalUnitTemperature,
+            externalUnitFanSpeed: reported.externalUnitFanSpeed,
         };
 
         return {
