@@ -439,6 +439,24 @@ const AcDetailModal = ({ device, isOpen, onClose }: AcDetailModalProps) => {
 
                         {/* Dynamic Controls Grid */}
                         <div className="space-y-6 pb-4 text-on-surface">
+
+                            {/* Wind Direction */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <DirectionArcSelector
+                                    title="Vertical Direction"
+                                    arcType="vertical"
+                                    options={VERTICAL_DIRECTIONS}
+                                    value={state?.verticalDirection}
+                                    onChange={(id) => handleUpdate({ verticalDirection: id })}
+                                />
+                                <DirectionArcSelector
+                                    title="Horizontal Direction"
+                                    arcType="horizontal"
+                                    options={HORIZONTAL_DIRECTIONS}
+                                    value={state?.horizontalDirection}
+                                    onChange={(id) => handleUpdate({ horizontalDirection: id })}
+                                />
+                            </div>
                             {/* Modes */}
                             <div className="bg-surface-container-highest/40 backdrop-blur-md p-5 rounded-[2rem] border border-white/5">
                                 <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-primary mb-4 ml-1">Operation Mode</p>
@@ -485,24 +503,6 @@ const AcDetailModal = ({ device, isOpen, onClose }: AcDetailModalProps) => {
                                         </button>
                                     ))}
                                 </div>
-                            </div>
-
-                            {/* Wind Direction */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <DirectionArcSelector
-                                    title="Vertical Direction"
-                                    arcType="vertical"
-                                    options={VERTICAL_DIRECTIONS}
-                                    value={state?.verticalDirection}
-                                    onChange={(id) => handleUpdate({ verticalDirection: id })}
-                                />
-                                <DirectionArcSelector
-                                    title="Horizontal Direction"
-                                    arcType="horizontal"
-                                    options={HORIZONTAL_DIRECTIONS}
-                                    value={state?.horizontalDirection}
-                                    onChange={(id) => handleUpdate({ horizontalDirection: id })}
-                                />
                             </div>
 
                             {/* Gen Mode & Switches */}

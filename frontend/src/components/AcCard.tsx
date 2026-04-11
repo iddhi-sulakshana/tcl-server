@@ -115,7 +115,7 @@ const AcCard = ({ device, onClick }: AcCardProps) => {
         <motion.div
             whileHover={isOnline ? { y: -8 } : {}}
             className={cn(
-                "glass-card w-full rounded-[2rem] p-8 relative overflow-hidden group transition-all duration-500",
+                "glass-card w-full rounded-[2rem] p-6 sm:p-8 relative overflow-hidden group transition-all duration-500",
                 isOn && isOnline ? "neon-border-primary neon-glow-primary" : "border-white/5",
                 isSelected && "ring-2 ring-primary",
                 !isOnline && "opacity-40 grayscale pointer-events-none"
@@ -126,7 +126,7 @@ const AcCard = ({ device, onClick }: AcCardProps) => {
             <div 
                 onClick={handleSelect}
                 className={cn(
-                    "absolute top-6 left-6 w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer z-10 pointer-events-auto",
+                    "absolute top-6 left-5 sm:left-6 w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer z-10 pointer-events-auto",
                     isSelected ? "bg-primary text-on-primary scale-110 shadow-lg shadow-primary/30" : "bg-white/5 text-white/20 hover:bg-white/10"
                 )}
             >
@@ -134,47 +134,51 @@ const AcCard = ({ device, onClick }: AcCardProps) => {
             </div>
 
             {/* Header Info */}
-            <div className="flex justify-between items-start mb-1">
-                <div className="pl-10">
-                    <h3 className="text-xl font-heading font-bold text-on-surface line-clamp-1">
+            <div className="flex justify-between items-start mb-1 gap-2">
+                <div className="pl-8 sm:pl-10 min-w-0 flex-1">
+                    <h3 className="text-lg sm:text-xl font-heading font-bold text-on-surface line-clamp-1">
                         {device.nickName}
                     </h3>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="flex items-start gap-2 mt-1.5">
                         <span className={cn(
-                            "w-2 h-2 rounded-full",
+                            "w-1.5 h-1.5 rounded-full mt-1.5",
                             isOnline ? (isOn ? "bg-tertiary animate-pulse" : "bg-white/20") : "bg-secondary"
                         )} />
-                        <span className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant flex items-center gap-2">
-                            {isOnline ? "System Active" : "DISCONNECTED"}
+                        <div className="flex flex-col gap-1 min-w-0">
+                            <span className="text-[10px] font-black tracking-[0.2em] uppercase text-on-surface-variant opacity-60">
+                                {isOnline ? "System Active" : "DISCONNECTED"}
+                            </span>
                             {isOnline && state?.currentTemperature && (
-                                <span className="text-primary font-bold flex items-center gap-1 flex-wrap">
-                                    <AirVent size={12} /> {state.currentTemperature}°C
+                                <div className="flex items-center gap-2 flex-wrap text-[9px] font-bold uppercase tracking-widest leading-none">
+                                    <span className="text-primary flex items-center gap-1">
+                                        <AirVent size={12} /> Inside {state.currentTemperature}°C
+                                    </span>
                                     {state?.externalUnitTemperature !== undefined && (
                                         <span className="text-orange-500 flex items-center gap-1">
-                                            &nbsp;&nbsp;<WashingMachine size={12} /> {state.externalUnitTemperature}°C
+                                            <WashingMachine size={12} /> Outside {state.externalUnitTemperature}°C
                                             {state?.externalUnitFanSpeed !== undefined && (
-                                                <>
-                                                    &nbsp;&nbsp;<Fan size={12} /> {state.externalUnitFanSpeed}
-                                                </>
+                                                <span className="flex items-center gap-1">
+                                                    <Fan size={12} /> Fan {state.externalUnitFanSpeed}
+                                                </span>
                                             )}
                                         </span>
                                     )}
-                                </span>
+                                </div>
                             )}
-                        </span>
+                        </div>
                     </div>
                 </div>
                 
                 <button
                     onClick={handlePowerToggle}
                     className={cn(
-                        "p-3 rounded-2xl transition-all duration-500 pointer-events-auto shadow-lg",
+                        "p-2.5 sm:p-3 rounded-2xl transition-all duration-500 pointer-events-auto shadow-lg shrink-0",
                         isOn && isOnline 
                             ? "bg-secondary text-on-secondary shadow-secondary/20" 
                             : "bg-surface-container-highest text-on-surface-variant"
                     )}
                 >
-                    <Power size={20} />
+                    <Power size={18} className="sm:size-[20px]" />
                 </button>
             </div>
 
