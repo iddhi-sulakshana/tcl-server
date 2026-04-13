@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useUpdateDeviceState } from "@/service/tclService";
 import type { DeviceWithState } from "@/types/tcl";
-import { Wind, Snowflake, Droplets, Sun, ChevronUp, ChevronDown, Check, Power, AirVent, WashingMachine, Fan } from "lucide-react";
+import { Wind, Snowflake, Droplets, Sun, ChevronUp, ChevronDown, Check, Power, AirVent, WashingMachine, Fan, RefreshCcw } from "lucide-react";
 import { useSelectionStore } from "@/lib/SelectionStore";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -70,8 +70,14 @@ const AcCard = ({ device, onClick }: AcCardProps) => {
         if (!checkOnline()) return;
 
         const properties: any = { workMode: mode };
-        if (mode === 1 || mode === 2) properties.targetTemperature = 16;
-        if (mode === 3 || mode === 4) properties.targetTemperature = 31;
+        if (mode === 1 || mode === 2) {
+            properties.targetTemperature = 16;
+            setLocalTemp(16);
+        }
+        if (mode === 3 || mode === 4) {
+            properties.targetTemperature = 31;
+            setLocalTemp(31);
+        }
 
         updateState.mutate({
             deviceId: device.deviceId,
@@ -102,7 +108,7 @@ const AcCard = ({ device, onClick }: AcCardProps) => {
         if (!checkOnline() || !state) return;
         updateState.mutate({
             deviceId: device.deviceId,
-            properties: { powerSwitch: state.powerSwitch === 1 ? 0 : 1 },
+            properties: state.powerSwitch === 1 ? { powerSwitch: 0 } : { powerSwitch: 1, healthy: 1 },
         });
     };
 
@@ -238,8 +244,8 @@ const AcCard = ({ device, onClick }: AcCardProps) => {
                     <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2.5 block opacity-60">Operation Mode</span>
                     <div className="flex justify-between bg-surface-container-lowest/50 p-1 rounded-2xl border border-white/5">
                         {[
+                            { id: 0, icon: RefreshCcw, name: "Auto" },
                             { id: 1, icon: Snowflake, name: "Cool" },
-                            { id: 0, icon: Sun, name: "Auto" },
                             { id: 2, icon: Droplets, name: "Dry" },
                             { id: 3, icon: Wind, name: "Fan" },
                             { id: 4, icon: Sun, name: "Heat" } // Using Sun for Heat too

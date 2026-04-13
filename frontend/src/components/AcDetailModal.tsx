@@ -466,8 +466,14 @@ const AcDetailModal = ({ device, isOpen, onClose }: AcDetailModalProps) => {
                                             key={mode.id}
                                             onClick={() => {
                                                 const properties: any = { workMode: mode.id };
-                                                if (mode.id === 1 || mode.id === 2) properties.targetTemperature = 16;
-                                                if (mode.id === 3 || mode.id === 4) properties.targetTemperature = 31;
+                                                if (mode.id === 1 || mode.id === 2) {
+                                                    properties.targetTemperature = 16;
+                                                    setLocalTemp(16);
+                                                }
+                                                if (mode.id === 3 || mode.id === 4) {
+                                                    properties.targetTemperature = 31;
+                                                    setLocalTemp(31);
+                                                }
                                                 handleUpdate(properties);
                                             }}
                                             className={cn(
