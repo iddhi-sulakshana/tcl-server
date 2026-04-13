@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useUpdateDeviceState } from "@/service/tclService";
 import type { DeviceWithState } from "@/types/tcl";
-import { Wind, Snowflake, Droplets, Sun, ChevronUp, ChevronDown, Check, Power, AirVent, WashingMachine, Fan, RefreshCcw } from "lucide-react";
+import { Wind, Snowflake, ChevronUp, ChevronDown, Check, Power, AirVent, WashingMachine, Fan } from "lucide-react";
 import { useSelectionStore } from "@/lib/SelectionStore";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -145,9 +145,9 @@ const AcCard = ({ device, onClick }: AcCardProps) => {
                     <h3 className="text-lg sm:text-xl font-heading font-bold text-on-surface line-clamp-1">
                         {device.nickName}
                     </h3>
-                    <div className="flex items-start gap-2 mt-1.5">
+                    <div className="flex items-start gap-2">
                         <span className={cn(
-                            "w-1.5 h-1.5 rounded-full mt-1.5",
+                            "w-1.5 h-1.5 rounded-full mt-1",
                             isOnline ? (isOn ? "bg-tertiary animate-pulse" : "bg-white/20") : "bg-secondary"
                         )} />
                         <div className="flex flex-col gap-1 min-w-0">
@@ -155,7 +155,7 @@ const AcCard = ({ device, onClick }: AcCardProps) => {
                                 {isOnline ? "System Active" : "DISCONNECTED"}
                             </span>
                             {isOnline && state?.currentTemperature && (
-                                <div className="flex items-center gap-2 flex-wrap text-[9px] font-bold uppercase tracking-widest leading-none">
+                                <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest leading-none">
                                     <span className="text-primary flex items-center gap-1">
                                         <AirVent size={12} /> Inside {state.currentTemperature}°C
                                     </span>
@@ -239,54 +239,53 @@ const AcCard = ({ device, onClick }: AcCardProps) => {
 
             {/* Quick Controls Grid */}
             <div className="grid grid-cols-1 gap-5 pointer-events-auto">
-                {/* Mode Strip */}
-                <div>
-                    <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2.5 block opacity-60">Operation Mode</span>
-                    <div className="flex justify-between bg-surface-container-lowest/50 p-1 rounded-2xl border border-white/5">
-                        {[
-                            { id: 0, icon: RefreshCcw, name: "Auto" },
-                            { id: 1, icon: Snowflake, name: "Cool" },
-                            { id: 2, icon: Droplets, name: "Dry" },
-                            { id: 3, icon: Wind, name: "Fan" },
-                            { id: 4, icon: Sun, name: "Heat" } // Using Sun for Heat too
-                        ].map((m) => (
-                            <button
-                                key={m.id}
-                                onClick={(e) => handleModeChange(e, m.id)}
-                                className={cn(
-                                    "flex-1 py-2.5 rounded-xl transition-all flex items-center justify-center",
-                                    state?.workMode === m.id ? "bg-primary text-on-primary shadow-lg shadow-primary/20" : "text-on-surface-variant hover:text-on-surface"
-                                )}
-                            >
-                                <m.icon size={18} />
-                            </button>
-                        ))}
+                {/* Mode + Fan Speed on same row */}
+                <div className="grid grid-cols-2 gap-3">
+                    {/* Operation Mode */}
+                    <div>
+                        <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2.5 block opacity-60">Mode</span>
+                        <div className="flex bg-surface-container-lowest/50 p-1 rounded-2xl border border-white/5">
+                            {[
+                                { id: 1, icon: Snowflake, name: "AC" },
+                                { id: 3, icon: Wind, name: "Fan" },
+                            ].map((m) => (
+                                <button
+                                    key={m.id}
+                                    onClick={(e) => handleModeChange(e, m.id)}
+                                    className={cn(
+                                        "flex-1 py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5",
+                                        state?.workMode === m.id ? "bg-primary text-on-primary shadow-lg shadow-primary/20" : "text-on-surface-variant hover:text-on-surface"
+                                    )}
+                                >
+                                    <m.icon size={14} />
+                                    <span className="text-[10px] font-bold uppercase">{m.name}</span>
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                </div>
 
-                {/* Fan Speed Row */}
-                <div>
-                    <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2.5 block opacity-60">Fan Speed</span>
-                    <div className="flex gap-2">
-                        {[
-                            { id: 2, name: "Low" },
-                            { id: 4, name: "Mid" },
-                            { id: 6, name: "High" },
-                            { id: 7, name: "Turbo" }
-                        ].map((s) => (
-                            <button
-                                key={s.id}
-                                onClick={(e) => handleFanChange(e, s.id)}
-                                className={cn(
-                                    "flex-1 py-1.5 text-[10px] font-bold uppercase border rounded-lg transition-all",
-                                    state?.windSpeed7Gear === s.id 
-                                        ? "bg-primary/20 border-primary/50 text-white shadow-[0_0_15px_rgba(94,180,255,0.1)]" 
-                                        : "border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-highest"
-                                )}
-                            >
-                                {s.name}
-                            </button>
-                        ))}
+                    {/* Fan Speed */}
+                    <div>
+                        <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2.5 block opacity-60">Fan Speed</span>
+                        <div className="flex gap-1.5">
+                            {[
+                                { id: 2, name: "Low" },
+                                { id: 7, name: "Max" },
+                            ].map((s) => (
+                                <button
+                                    key={s.id}
+                                    onClick={(e) => handleFanChange(e, s.id)}
+                                    className={cn(
+                                        "flex-1 py-2.5 text-[10px] font-bold uppercase border rounded-xl transition-all",
+                                        state?.windSpeed7Gear === s.id
+                                            ? "bg-primary/20 border-primary/50 text-white shadow-[0_0_15px_rgba(94,180,255,0.1)]"
+                                            : "border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-highest"
+                                    )}
+                                >
+                                    {s.name}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
