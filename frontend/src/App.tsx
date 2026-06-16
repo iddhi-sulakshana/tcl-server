@@ -1,6 +1,5 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
+import Login from "./screens/Login";
+import Dashboard from "./screens/Dashboard";
 import { useTclSession } from "./service/tcl/sessionStore";
 
 const App = () => {
@@ -8,19 +7,8 @@ const App = () => {
     // user's real credentials. Session is in-memory, so a refresh returns here.
     const status = useTclSession((state) => state.status);
 
-    // If not connected to TCL, show login page for all routes
-    if (status !== "connected") {
-        return <Login />;
-    }
-
-    // If authenticated, show routes
-    return (
-        <Routes>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-    );
+    // Single client-side gate: connected -> Dashboard, otherwise Login.
+    return status === "connected" ? <Dashboard /> : <Login />;
 };
 
 export default App;
-

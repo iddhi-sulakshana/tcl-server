@@ -2,7 +2,7 @@ import axios from "axios";
 import { useAuthStore } from "./AuthStore";
 
 const ApiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
+    baseURL: process.env.NEXT_PUBLIC_API_URL,
 });
 
 // Add interceptor to the axios instance

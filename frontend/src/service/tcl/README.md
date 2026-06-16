@@ -53,29 +53,32 @@ fail the same way and can't dodge it — its `timestamp/nonce/sign/accesstoken` 
 The CORS + `User-Agent` limits vanish the moment the calls don't originate from a
 browser sandbox. So the chain runs unchanged behind any relay.
 
-## Dev: the chain works now via the Vite proxy
+## The chain works via the Next route handler
 
-`vite.config.ts` adds a `tclDevProxy()` middleware at `/__tclproxy`. In dev,
-`TclClient` (via `proxyPath` in `config.ts`, on when `import.meta.env.DEV`) rewrites
-each TCL/cloud/device call to POST `/__tclproxy` with the real URL in `x-tcl-target`;
+`app/api/tclproxy/route.ts` is a Node route handler at `/api/tclproxy`. `TclClient`
+(via `proxyPath` in `config.ts`, default `/api/tclproxy`) rewrites each
+TCL/cloud/device call to POST `/api/tclproxy` with the real URL in `x-tcl-target`;
 Node forwards it server-side — no CORS, and it injects the Android `User-Agent` the
 browser strips. **AWS Cognito/IoT are NOT proxied** (already browser-friendly).
 
-`bun dev` → log in with a real TCL account → full chain completes. Verified: the proxy
-relays `cloud_url_get` and `login` and returns real TCL responses.
+`npm run dev` (or `next start`, or a Vercel deploy) → log in with a real TCL account
+→ full chain completes. Verified: the relay returns real `cloud_url_get` / `login`
+responses with no CORS. The same route handler runs in dev, `next start`, and Vercel
+— no dev-only gap. (Path avoids a leading underscore: Next treats `_*` folders as
+private and won't route them, so the old `/__tclproxy` name can't be used here.)
 
-⚠️ This middleware is **dev-server only**. The production build calls direct and will
-hit the same CORS wall unless you ship one of the production paths below.
+Set `NEXT_PUBLIC_TCL_PROXY_PATH=""` to bypass the proxy and call TCL hosts directly
+(only works in a native shell — browsers CORS-block it).
 
-## Production paths (pick one)
+## Alternative paths (if you ever leave Next)
 
 - **Native shell — truest "no backend".** Reuse `TclClient.ts` verbatim in Tauri /
   Electron / a browser extension (`host_permissions`) / Capacitor. No CORS, no proxy,
-  no server. This is what the TCL app itself does. Set `proxyPath: undefined`.
-- **Thin relay — keep it a web app.** Port the ~30-line `/__tclproxy` middleware to a
-  Vercel Edge Function / serverless route and point `proxyPath` at it. Not the old
-  server (no DB/auth/logic) — just a dumb same-origin relay. **Never** use a public
-  third-party CORS proxy: credentials + tokens transit it.
+  no server. This is what the TCL app itself does. Set `proxyPath` to `""`.
+- **Thin relay elsewhere.** The ~30-line relay logic ports to any serverless route;
+  point `proxyPath` at it. Not the old server (no DB/auth/logic) — just a dumb
+  same-origin relay. **Never** use a public third-party CORS proxy: credentials +
+  tokens transit it.
 - **Keep the existing backend.** It already is that relay, plus the shared-account
   model. Revert the 6 component import swaps to fall back to `tclService.ts`.
 

@@ -16,7 +16,7 @@
 
     --color-background: #020f1e;
     --color-foreground: #d8e6fc;
-    
+
     --color-primary: #5eb4ff;
     --color-primary-dim: #15a4ff;
     --color-on-primary: #003151;
@@ -24,7 +24,7 @@
 
     --color-secondary: #ff7162;
     --color-on-secondary: #4a0001;
-    
+
     --color-tertiary: #aaffdc;
     --color-on-tertiary: #003822;
     --color-tertiary-container: #00fdc1;
@@ -39,7 +39,7 @@
 
     --color-on-surface: #d8e6fc;
     --color-on-surface-variant: #9eacc0;
-    
+
     --color-outline: #697689;
     --color-outline-variant: #3b495a;
 
@@ -66,7 +66,7 @@
     .glass-card {
         @apply bg-surface-container-highest/40 backdrop-blur-3xl border border-primary/20 shadow-2xl;
     }
-    
+
     .neon-border-primary {
         @apply border border-primary/30 ring-4 ring-primary/5;
     }
@@ -98,4 +98,42 @@
     }
 }
 
+/* Pre-mount loader (ported from the old index.html). Shown until the client
+   app mounts, then replaced by the React tree. */
+.full-page-loader {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    /* Solid black background to match logo */
+    background: #020f1e;
+}
 
+.full-page-loader > img {
+    animation: 5s infinite heartbeat;
+    max-width: 300px;
+    height: auto;
+}
+
+@keyframes heartbeat {
+    0% {
+        transform: scale(1);
+    }
+    25% {
+        transform: scale(1.05);
+    }
+    50% {
+        transform: scale(1);
+    }
+    75% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
