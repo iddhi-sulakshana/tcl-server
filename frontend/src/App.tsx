@@ -1,13 +1,15 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import { useAuthStore } from "./lib/AuthStore";
+import { useTclSession } from "./service/tcl/sessionStore";
 
 const App = () => {
-    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+    // Backend-less path: "authenticated" === connected to TCL Cloud with the
+    // user's real credentials. Session is in-memory, so a refresh returns here.
+    const status = useTclSession((state) => state.status);
 
-    // If not authenticated, show login page for all routes
-    if (!isAuthenticated) {
+    // If not connected to TCL, show login page for all routes
+    if (status !== "connected") {
         return <Login />;
     }
 

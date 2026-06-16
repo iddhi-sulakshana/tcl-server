@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useDevices, useRelogin } from "@/service/tclService";
+import { useDevices, useRelogin } from "@/service/tcl/hooks";
 import AcCard from "@/components/AcCard";
 import GlobalControls from "@/components/GlobalControls";
 import AcDetailModal from "@/components/AcDetailModal";
 import type { DeviceWithState } from "@/types/tcl";
 import { RefreshCcw, LogOut, Check } from "lucide-react";
-import { useAuthStore } from "@/lib/AuthStore";
+import { useTclSession } from "@/service/tcl/sessionStore";
 import { motion } from "framer-motion";
 import { useSelectionStore } from "@/lib/SelectionStore";
 import { cn } from "@/lib/utils";
@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 const Dashboard = () => {
     const { data: devices, isLoading } = useDevices();
     const { mutate: relogin, isPending: isRelogging } = useRelogin();
-    const logout = useAuthStore((state) => state.logout);
+    const logout = useTclSession((state) => state.logout);
 
     const [selectedDevice, setSelectedDevice] = useState<DeviceWithState | null>(null);
     const { selectedDeviceIds, selectAll, clearSelection } = useSelectionStore();

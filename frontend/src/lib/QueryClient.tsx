@@ -3,8 +3,7 @@ import { QueryClient } from "@tanstack/react-query";
 export default new QueryClient({
     defaultOptions: {
         queries: {
-            retry: true, // retry 3 times if the query fails
-            retryDelay: 5000, // delay 5 seconds between retries
+            retry: false, // no retries on error — single attempt
 
             refetchOnMount: true,
             refetchOnReconnect: true,
@@ -12,8 +11,7 @@ export default new QueryClient({
             refetchIntervalInBackground: true,
         },
         mutations: {
-            retry: true,
-            retryDelay: 5000,
+            retry: false, // no retries on error — single attempt
         },
     },
 });

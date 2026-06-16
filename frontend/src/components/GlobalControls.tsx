@@ -1,4 +1,4 @@
-import { useBulkUpdate, useDevices } from "@/service/tclService";
+import { useBulkUpdate, useDevices } from "@/service/tcl/hooks";
 import { useSelectionStore } from "@/lib/SelectionStore";
 import { Power, PowerOff, RefreshCcw, Snowflake, Wind } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";

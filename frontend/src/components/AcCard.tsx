@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useUpdateDeviceState } from "@/service/tclService";
+import { useUpdateDeviceState } from "@/service/tcl/hooks";
 import type { DeviceWithState } from "@/types/tcl";
 import { Wind, Snowflake, ChevronUp, ChevronDown, Check, Power, AirVent, WashingMachine, Fan } from "lucide-react";
 import { useSelectionStore } from "@/lib/SelectionStore";

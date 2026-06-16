@@ -3,13 +3,14 @@ import { motion } from "framer-motion";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { useLogin } from "@/service/tclService";
+import { useTclLogin } from "@/service/tcl/hooks";
 
 const Login = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const loginMutation = useLogin();
+    // Real TCL account credentials — runs the auth chain client-side, no backend.
+    const loginMutation = useTclLogin();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

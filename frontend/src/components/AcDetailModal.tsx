@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronUp, ChevronDown, Wind, Snowflake, Droplets, RefreshCcw, Zap, Power, Bell, Sun, Tv, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, ArrowDownLeft, ArrowDownRight, ArrowUpRight, Leaf, AirVent, WashingMachine, Fan, type LucideIcon } from "lucide-react";
-import { useDeviceState, useUpdateDeviceState } from "@/service/tclService";
+import { useDeviceState, useUpdateDeviceState } from "@/service/tcl/hooks";
 import type { DeviceWithState } from "@/types/tcl";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
