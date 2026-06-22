@@ -34,6 +34,7 @@ import type {
     TclLoginResponseData,
     TclLogger,
     TclRefreshTokensResponseData,
+    PersistedTclSession,
 } from "./types";
 
 type QueueItem<T> = {
@@ -59,6 +60,7 @@ export default class TclClient {
     private username: string | null = null;
     private countryAbbr: string | null = null;
     private token: string | null = null;
+    private refreshToken: string | null = null;
     private cognitoToken: string | null = null;
     private cognitoId: string | null = null;
     private saasToken: string | null = null;
@@ -75,15 +77,15 @@ export default class TclClient {
     private currentDeviceState: Record<string, CachedDeviceData> = {};
     private connected = false;
 
-    private readonly MAX_LOGIN_RETRIES = 1; // single attempt, no retry on error
     private queue: QueueItem<unknown>[] = [];
     private processingQueue = false;
     private refreshInterval: ReturnType<typeof setInterval> | null = null;
-    private loginRetryCount = 0;
+    private refreshFailures = 0;
 
-    private readonly cfg: Required<Omit<TclClientConfig, "logger" | "proxyPath">> & {
+    private readonly cfg: Required<Omit<TclClientConfig, "logger" | "proxyPath" | "onSessionExpired">> & {
         logger: TclLogger;
         proxyPath?: string;
+        onSessionExpired?: () => void;
     };
 
     constructor(config: TclClientConfig) {
@@ -96,6 +98,7 @@ export default class TclClient {
             refreshIntervalMs: config.refreshIntervalMs ?? 900000, // 15 min
             logger: config.logger ?? noopLogger,
             proxyPath: config.proxyPath,
+            onSessionExpired: config.onSessionExpired,
         };
     }
 
@@ -169,11 +172,17 @@ export default class TclClient {
             this.setupBaseAxios();
             const response = await this.axiosLogin!.post<TclLoginResponseData>("");
             if (response.status !== 200 || !response.data || response.data.status !== 1) {
-                throw new Error(response.data?.msg || "Unknown error");
+                const code = response.data?.status;
+                const detail =
+                    response.data?.msg ||
+                    (typeof response.data === "object" ? JSON.stringify(response.data).slice(0, 300) : String(response.data)) ||
+                    "Unknown error";
+                throw new Error(`TCL login rejected (status ${code}): ${detail}`);
             }
 
             this.username = response.data.user.username;
             this.token = response.data.token;
+            this.refreshToken = response.data.refreshToken ?? null;
             this.countryAbbr = response.data.user.countryAbbr;
             this.log.info("Login successful");
 
@@ -285,16 +294,55 @@ export default class TclClient {
         this.log.info("Get AWS credentials successful");
     }
 
+    /**
+     * Restore a session from persisted tokens — skips the password login and
+     * re-derives the whole downstream chain (cloud URLs → SaaS → Cognito → STS)
+     * from the stored base token. Throws if the base token is expired/invalid.
+     */
+    public async restore(session: PersistedTclSession): Promise<void> {
+        this.reset();
+        this.username = session.username;
+        this.token = session.token;
+        this.refreshToken = session.refreshToken;
+        this.countryAbbr = session.countryAbbr;
+        this.setupBaseAxios();
+        await this.getCloudUrls(); // chains refreshTokens → getAwsCredentials, sets `connected`
+        if (!this.connected) throw new Error("Session restore failed");
+        this.log.info("Session restored from token");
+    }
+
+    /**
+     * Token-based refresh: re-mint the short-lived tokens (SaaS ~30m, Cognito ~2h,
+     * STS ~1h) from the 30-day base token. No password needed. Throws on failure.
+     */
+    public async refresh(): Promise<void> {
+        if (!this.token || !this.username) throw new Error("No base token to refresh");
+        this.setupBaseAxios();
+        await this.getCloudUrls();
+        if (!this.connected) throw new Error("Token refresh failed");
+    }
+
+    /** Snapshot the persistable session (no password/short-lived tokens). */
+    public exportSession(): PersistedTclSession | null {
+        if (!this.token || !this.username || !this.countryAbbr) return null;
+        return {
+            username: this.username,
+            token: this.token,
+            refreshToken: this.refreshToken,
+            countryAbbr: this.countryAbbr,
+        };
+    }
+
     public async logout() {
         if (!this.connected) return;
         this.reset();
         this.log.info("Logout successful");
     }
 
+    /** Manual "Cloud Relogin" — refreshes the session from the base token (no password). */
     public async relogin(): Promise<void> {
         this.log.info("Manual re-login initiated");
-        await this.logout();
-        await this.authenticate();
+        await this.refresh();
         this.log.info(this.connected ? "Manual re-login successful" : "Manual re-login failed");
     }
 
@@ -462,7 +510,7 @@ export default class TclClient {
             const item = this.queue.shift();
             if (!item) continue;
             try {
-                if (!this.connected) await this.loginWithRetry();
+                if (!this.connected) await this.reconnect();
                 const result = await item.requestFn();
                 item.resolve(result);
             } catch (error) {
@@ -472,19 +520,19 @@ export default class TclClient {
         this.processingQueue = false;
     }
 
-    private async loginWithRetry() {
-        while (this.loginRetryCount < this.MAX_LOGIN_RETRIES) {
-            try {
-                await this.authenticate();
-                if (this.connected) {
-                    this.loginRetryCount = 0;
-                    return;
-                }
-                this.loginRetryCount++;
-            } catch (error: unknown) {
-                this.log.error(`Login failed: ${error}`);
-                this.loginRetryCount++;
-            }
+    /**
+     * Recover a dropped connection (e.g. a 403 once the SaaS/STS tokens lapse) by
+     * refreshing from the 30-day base token — no password. If the base token is
+     * itself dead, flag the session expired so the UI returns to login.
+     */
+    private async reconnect(): Promise<void> {
+        try {
+            await this.refresh();
+        } catch (error: unknown) {
+            this.log.error(`Reconnect failed: ${error}`);
+            this.connected = false;
+            this.cfg.onSessionExpired?.();
+            throw error;
         }
     }
 
@@ -493,16 +541,22 @@ export default class TclClient {
         if (!this.cfg.refreshIntervalMs) return;
 
         this.refreshInterval = setInterval(async () => {
-            this.log.info("Login interval triggered");
+            this.log.info("Token refresh interval triggered");
             try {
-                await this.logout();
-                await this.authenticate();
-                this.log.info(this.connected ? "Login interval successful" : "Login interval failed - not connected");
+                await this.refresh();
+                this.refreshFailures = 0;
+                this.log.info("Token refresh successful");
             } catch (error: unknown) {
-                this.log.error(`Login interval failed: ${error}`);
+                this.refreshFailures++;
+                this.log.error(`Token refresh failed (${this.refreshFailures}): ${error}`);
+                // One miss can be transient; a second means the base token is dead.
+                if (this.refreshFailures >= 2) {
+                    this.connected = false;
+                    this.cfg.onSessionExpired?.();
+                }
             }
         }, this.cfg.refreshIntervalMs);
-        this.log.info("Login interval started");
+        this.log.info("Token refresh interval started");
     }
 
     private reset() {
@@ -515,6 +569,7 @@ export default class TclClient {
         this.username = null;
         this.countryAbbr = null;
         this.token = null;
+        this.refreshToken = null;
         this.cognitoToken = null;
         this.cognitoId = null;
         this.saasToken = null;
