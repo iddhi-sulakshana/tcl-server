@@ -123,10 +123,25 @@ export type TclLogger = {
     error: (msg: string) => void;
 };
 
+/**
+ * The minimal session restorable from localStorage without the password.
+ * The base access `token` (~30d) re-derives the whole downstream chain
+ * (cloud URLs → SaaS → Cognito → STS), so the password is NEVER persisted.
+ */
+export type PersistedTclSession = {
+    username: string;
+    /** Base access token (ssoToken) — ~30 day lifetime. Seeds everything below. */
+    token: string;
+    /** Refresh token — ~360 day lifetime. Reserved for future base-token renewal. */
+    refreshToken: string | null;
+    /** Country code, needed for the device_url `countrycode` header. */
+    countryAbbr: string;
+};
+
 export type TclClientConfig = {
     /** TCL account login (the real TCL app email/username). */
     username: string;
-    /** TCL account password — md5'd before transit, never stored server-side. */
+    /** TCL account password — md5'd before transit, never persisted. Pass "" when restoring from a token. */
     password: string;
     appId: string;
     loginUrl: string;
@@ -134,6 +149,12 @@ export type TclClientConfig = {
     logger?: TclLogger;
     /** Auto re-auth interval in ms. 0 disables. Default 15 min. */
     refreshIntervalMs?: number;
+    /**
+     * Called when the session can no longer be refreshed from the stored base
+     * token (≈30-day base-token expiry, or a hard auth failure). The store uses
+     * this to clear persisted state and drop the user back to the login screen.
+     */
+    onSessionExpired?: () => void;
     /**
      * Same-origin path to relay TCL/cloud/device calls through (dev only).
      * When set, the TCL (non-AWS) axios calls are rewritten to POST `proxyPath`
