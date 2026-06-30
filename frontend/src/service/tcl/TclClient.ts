@@ -376,7 +376,7 @@ export default class TclClient {
             const sign = md5(timestamp + nonce + this.saasToken);
 
             // ⚠️ CORS: device_url + these custom headers force a preflight. UNVERIFIED.
-            const response = await this.axiosDevices!.post<TclDeviceListResponseData>("/v3/user/get_things", null, {
+            const response = await this.axiosDevices!.post<TclDeviceListResponseData>("/v3/user/get_things", {}, {
                 headers: { timestamp, nonce, sign },
             });
             if (response.status !== 200 || !response.data) {

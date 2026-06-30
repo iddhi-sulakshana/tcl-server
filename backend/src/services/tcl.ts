@@ -281,7 +281,7 @@ export default class TCL {
 
             const response = await this.axiosDevices!.post(
                 `/v3/user/get_things`,
-                null,
+                {},
                 {
                     headers: {
                         timestamp,
