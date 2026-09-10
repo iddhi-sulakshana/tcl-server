@@ -6,6 +6,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import App from "@/App";
 import ThemeSync from "@/components/ThemeSync";
+import ServiceWorkerManager from "@/components/ServiceWorkerManager";
 import { Toaster } from "@/components/ui/sonner";
 import QueryClient from "@/lib/QueryClient";
 
@@ -28,6 +29,7 @@ export default function Page() {
         <StrictMode>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
                 <ThemeSync />
+                <ServiceWorkerManager />
                 <QueryClientProvider client={QueryClient}>
                     <App />
                     <Toaster
