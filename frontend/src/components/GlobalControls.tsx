@@ -2,6 +2,7 @@ import { useBulkUpdate, useDevices } from "@/service/tcl/hooks";
 import { useSelectionStore } from "@/lib/SelectionStore";
 import { Power, PowerOff, RefreshCcw, Snowflake, Wind } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { COOL_MODE_TEMPERATURE, POWER_ON_TEMPERATURE } from "@/types/tcl";
 
 const GlobalControls = () => {
     const { selectedDeviceIds } = useSelectionStore();
@@ -15,7 +16,7 @@ const GlobalControls = () => {
     const handleBulkPower = (isOn: boolean) => {
         bulkUpdate.mutate({
             deviceIds: targetDeviceIds,
-            properties: { powerSwitch: isOn ? 1 : 0 },
+            properties: isOn ? { powerSwitch: 1, targetTemperature: POWER_ON_TEMPERATURE } : { powerSwitch: 0 },
         });
     };
 
@@ -28,7 +29,8 @@ const GlobalControls = () => {
 
     const handleBulkMode = (mode: number) => {
         const properties: any = { workMode: mode };
-        if (mode === 1 || mode === 2) properties.targetTemperature = 16;
+        if (mode === 1) properties.targetTemperature = COOL_MODE_TEMPERATURE;
+        if (mode === 2) properties.targetTemperature = 16;
         if (mode === 3 || mode === 4) properties.targetTemperature = 31;
 
         bulkUpdate.mutate({

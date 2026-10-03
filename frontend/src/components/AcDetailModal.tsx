@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronUp, ChevronDown, Wind, Snowflake, Droplets, RefreshCcw, Zap, Power, Bell, Sun, Tv, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, ArrowDownLeft, ArrowDownRight, ArrowUpRight, Leaf, AirVent, WashingMachine, Fan, type LucideIcon } from "lucide-react";
 import { useDeviceState, useUpdateDeviceState } from "@/service/tcl/hooks";
-import type { DeviceWithState } from "@/types/tcl";
+import { COOL_MODE_TEMPERATURE, POWER_ON_TEMPERATURE, type DeviceWithState } from "@/types/tcl";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -424,7 +424,14 @@ const AcDetailModal = ({ device, isOpen, onClose }: AcDetailModalProps) => {
                         {/* Power Toggle */}
                         <div className="flex justify-center mb-8">
                             <button
-                                onClick={() => handleUpdate(state?.powerSwitch === 1 ? { powerSwitch: 0 } : { powerSwitch: 1, healthy: 1 })}
+                                onClick={() => {
+                                    if (state?.powerSwitch === 1) {
+                                        handleUpdate({ powerSwitch: 0 });
+                                    } else {
+                                        setLocalTemp(POWER_ON_TEMPERATURE);
+                                        handleUpdate({ powerSwitch: 1, healthy: 1, targetTemperature: POWER_ON_TEMPERATURE });
+                                    }
+                                }}
                                 className={cn(
                                     "flex items-center gap-3 px-10 py-4 rounded-full font-bold transition-all duration-500 shadow-xl group",
                                     state?.powerSwitch === 1 
@@ -466,7 +473,11 @@ const AcDetailModal = ({ device, isOpen, onClose }: AcDetailModalProps) => {
                                             key={mode.id}
                                             onClick={() => {
                                                 const properties: any = { workMode: mode.id };
-                                                if (mode.id === 1 || mode.id === 2) {
+                                                if (mode.id === 1) {
+                                                    properties.targetTemperature = COOL_MODE_TEMPERATURE;
+                                                    setLocalTemp(COOL_MODE_TEMPERATURE);
+                                                }
+                                                if (mode.id === 2) {
                                                     properties.targetTemperature = 16;
                                                     setLocalTemp(16);
                                                 }

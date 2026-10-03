@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useUpdateDeviceState } from "@/service/tcl/hooks";
-import type { DeviceWithState } from "@/types/tcl";
+import { COOL_MODE_TEMPERATURE, POWER_ON_TEMPERATURE, type DeviceWithState } from "@/types/tcl";
 import { Wind, Snowflake, ChevronUp, ChevronDown, Check, Power, AirVent, WashingMachine, Fan } from "lucide-react";
 import { useSelectionStore } from "@/lib/SelectionStore";
 import { motion } from "framer-motion";
@@ -70,7 +70,11 @@ const AcCard = ({ device, onClick }: AcCardProps) => {
         if (!checkOnline()) return;
 
         const properties: any = { workMode: mode };
-        if (mode === 1 || mode === 2) {
+        if (mode === 1) {
+            properties.targetTemperature = COOL_MODE_TEMPERATURE;
+            setLocalTemp(COOL_MODE_TEMPERATURE);
+        }
+        if (mode === 2) {
             properties.targetTemperature = 16;
             setLocalTemp(16);
         }
@@ -106,9 +110,13 @@ const AcCard = ({ device, onClick }: AcCardProps) => {
     const handlePowerToggle = (e: React.MouseEvent) => {
         e.stopPropagation();
         if (!checkOnline() || !state) return;
+        if (state.powerSwitch !== 1) setLocalTemp(POWER_ON_TEMPERATURE);
         updateState.mutate({
             deviceId: device.deviceId,
-            properties: state.powerSwitch === 1 ? { powerSwitch: 0 } : { powerSwitch: 1, healthy: 1 },
+            properties:
+                state.powerSwitch === 1
+                    ? { powerSwitch: 0 }
+                    : { powerSwitch: 1, healthy: 1, targetTemperature: POWER_ON_TEMPERATURE },
         });
     };
 

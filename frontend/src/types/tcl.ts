@@ -1,3 +1,8 @@
+// Setpoint applied whenever an AC is switched on from the dashboard
+export const POWER_ON_TEMPERATURE = 26;
+// Setpoint applied when switching to Cool mode
+export const COOL_MODE_TEMPERATURE = 26;
+
 export interface DeviceItem {
     deviceId: string;
     deviceName: string;
